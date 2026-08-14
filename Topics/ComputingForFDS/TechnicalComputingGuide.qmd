@@ -1,0 +1,444 @@
+---
+title: "Technical Computing Guide"
+subtitle: "Financial Data Science | Prof. Aguilar"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+engine: knitr
+execute:
+  warning: false
+  echo: true
+---
+
+# Overview
+
+## Computing Tools for Financial Data Science
+
+This list is not comprehensive, but useful:
+
+- Statistical languages:
+  - Major: R, Python,
+  - Minor: Julia, Matlab, SAS
+- Databases:
+  - SQL (query language)
+  - MySQL, Snowflake
+- Spreadsheets: Excel
+- Data Viz:
+  - Open Source: Plotly, ggplot2, matplotlib/seaborn
+  - Interactive: Shiny, Streamlit, Dash
+  - Commercial: Tableau, MSFT Power BI
+- Base languages: C++, C#
+- Documentation: Quarto, Markdown, Jupyter
+- Version Control: Git (GitHub)
+
+# Set Up R
+
+## Installation
+
+- Install R
+  - [CRAN project](https://cran.r-project.org/)
+  - Reminder: I accept python in this course, but R will be the primary language for demonstrations and support
+- Install IDE
+  - [R Studio](https://posit.co/downloads)
+  - [Positron](https://positron.posit.co/download) --- Note: Positron supports R and Python
+
+
+## Verifying R
+
+- Test your IDE
+  - Open your IDE
+  - Start Session
+  - Enter 2 + 2 in the console; verify the computing engine is working properly
+- Test package installation
+  - In the console type "install.packages("here")"
+  - In the console type "library(here)"
+
+## Verifying Paths
+
+Loading and saving files and functions within a direcotry requires appropriate setting of path on your machine. The path tells the program where to look.
+
+R Studio
+
+- Best practice is to work within R Projects. The working directory becomes wherever the RProj file is located.
+  - File -\> New Project -\> New or Existing Directory depending upon your use case -\> Quarto Project
+  - For future work sessions, be sure to open the project, not just the files.
+  - All files can then be loaded (or saved) relative to that working directory e.g. read.csv("./Data/fakedata.csv")
+- You can also manually set the working directory via the gear icon in the Files panel or use setwd("C:/Users/Mike/Documents")
+
+Positron
+
+- Positron doesn't leverage RProjects (though they can be added)
+- Instead, place a simple yaml file where you want the root working directory to be located.
+  - File -\> New Text File
+  - project: type: default
+  - Save filename as \_quarto.yml
+- Wherever you place that yml is the root working directory for this project, permitting you to use relative path referencing e.g. read.csv("./Data/fakedata.csv")
+
+Task: 
+
+- Set your working directory in your preferred IDE 
+- Enter getwd() in the console to verify the working directory is where you intended
+
+# Git
+
+## Why need Version Control?
+
+Don't do:
+
+- first version.R
+- first version_19J.R
+- Final.R
+- Final_v2.R
+- Final_v2_last.R
+
+Why? 
+
+1.  Confusion over version ordering; "which is the final version?"
+2.  Can't answer: "I need to revert back to the version that had my original approach. Which is that?""
+3.  Poor naming convention is unprofessional delivery to clients
+
+## Version Control Tools
+A version control system includes proper naming convention and tools to track and manage changes.  
+
+- Git: version control system
+  - Tracks changes to files (not just code)
+  - Stores the complete history of a project
+  - Enables branching and merging
+  - Works entirely on your local computer
+- GitHub: cloud platform that lists Git repositories and supports collaboration
+  - Stores copies of Git repositories online
+  - Synchronizes work across multiple computers
+  - Facilitates collaboration
+  - Adds features beyond Git itself (pull requests, code review, GitHub Actions, Classroom, Organizations, etc.)
+- GitHub Desktop: 
+  - Local interface to GitHub
+
+## Installation 
+
+### GitHub 
+
+- Create a free GitHub account.
+- [Sign Up](https://github.com/signup)
+- Please use your duke email.
+
+### Git 
+
+- Install Git
+- [Download](https://git-scm.com/install/)
+
+### GitHub Desktop (Optional)
+
+- (Download)\[https://desktop.github.com/download/\]
+
+
+## Connection to IDE
+You can interact with GitHub entirely via the Web GUI by downloading the repo, making changes, and uploading the changes.  
+
+Another approach is to integrate GitHub directly into your IDE. 
+
+### Connect Git to R Studio
+
+- Tools -> Git/SVN
+- Check the box "Enable version control interface for RStudio projects"
+- (Optional) check box of "Sign git commits"
+- Git executable: Find the executable for Git on your machine.  Sometimes this is tricky.  Here are two examples
+  - C:\Program Files\Git\cmd\git.exe
+  - C:/Users/mda3/AppData/Local/GitHubDesktop/app-3.6.2/resources/app/git/cmd/git.exe
+- Click Apply
+- To verify if Git was activated, go to File -> New Project -> Version Control.  You should see Git as an option. 
+
+
+### Connect GitHub to Positron
+
+- File -> Preferences -> Settings
+- Search for Git: Enabled, which should be check on. Positron should detect Git automatically. 
+- If Positron can't find Git, then search for Git: Path and edit the json
+
+
+## Verifying Access to Class Organization 
+
+- All registered students should have access to the FDS-Fall2026 organization
+- Log into GitHub with your Duke email
+- Click on your avatar in the top right corner
+- Click on organizations
+- You should see FDS-Fall2026
+- If you don't, please let the instructional staff known ASAP
+
+
+## Connecting to Class Repo
+
+The repo fds-fall2026-course-materials contains all the documents that I will share with you during the semester.  These documents will evolve over time.  You only have "read access" to this repo.  
+
+You have two options to acquire the latest versions. 
+
+### Option 1 (via web GUI)
+
+- Go to the FDS-Fall2026 organization on GitHub.com
+- Go to the fds-fall2026-course-materials repo
+- Click on the green "Code" button
+- Click Download ZIP
+- Unzip on your machine 
+- Repeat for every update to the repo
+
+### Option 2 (Connect to GitHub via your IDE)
+Cloning creates a local copy of the repository on your computer and maintains a connection to the GitHub repository.
+
+You only need to clone the repository once. After that, use Pull to retrieve updates during the semester.
+
+RStudio: 
+
+- On GitHub, navigate to the fds-fall2026-course-materials repository.
+- Click the green Code button.
+- Make sure HTTPS is selected.
+- Copy the repository URL.
+- Open RStudio.
+- Select File → New Project → Version Control → Git.
+- Paste the repository URL into Repository URL.
+- Choose the folder on your computer where you want the course repository stored.
+- Click Create Project.
+
+You only need to clone the project once.  
+
+Whenever you want the latest course materials
+
+- Open the project in R Studio
+- Go to the Git pane (should show up in the toolbar to the left of "Add Ins")
+- Click Pull
+
+
+Positron: 
+
+- On GitHub, navigate to the fds-fall2026-course-materials repository.
+- Click the green Code button.
+- Make sure HTTPS is selected.
+- Copy the repository URL.
+- Open Positron.
+- Open the Command Palette:
+  - Windows: Ctrl + Shift + P | macOS: Cmd + Shift + P
+  - Search for and select: Git: Clone
+- Paste the GitHub repository URL.
+- Select the location on your computer where you want the repository stored.
+- When prompted, select Open to open the cloned repository in Positron.
+
+You only need to clone the project once.  
+
+Whenever you want the latest course materials
+
+- Open the fds-fall2026-course-materials folder in Positron.
+- Open the Source Control panel (the icon in left toolbar that looks like several connected dots)
+- Click the three dots ... and select Pull
+
+
+### Testing Class Repo Connection
+
+- Let's test your connection.  
+- Clone the class repo as per the instructions above
+- Pull the latest edition
+- The instructor will make a minor edit to the README
+- Pull again and notice the changes your your local machine
+
+
+## Student Private Repo
+You will submit class materials via GitHub within your own private repo. 
+
+- Go to GitHub.com and log in with your Duke email
+- Go to the course organization 
+- Click New Repository
+- Under Owner, ensure that you select the FDS-Fall2026 organization and not your personal GitHub account
+- Use the following name convention.  Mike Aguilar's repo for the 20206 FDS course would be MikeAguilar-FDS-Fall2026.  
+- Under visibility, select Private
+- Select "add README", but you don't need to add licensce or gitignore
+  - Note: gitignore indicates which files/folders not to track
+- Click create repository
+
+### Clone Private Repo
+
+- Clone Personal Repo as per the instructions above
+- Pull Personal Repo
+- Create a folder called "ClassExercises", which you can use to store any class exercises.  
+- Create a folder called "CourseProject", which you can use to store code and deliverables associated with your course project.  
+- Commit the change
+- Push the change
+- Visit GitHub on the web to confirm the change
+
+## Managing Conflicts
+If you are working across multiple machines or with teammates, conflicts within the code may occur. 
+
+A merge conflict occurs when Git cannot determine automatically how to combine two different versions of the same file.
+
+This most often happens when:
+
+two people edit the same lines of the same file,
+you make local changes while someone else changes the GitHub version,
+you pull changes from GitHub that overlap with your own uncommitted or committed work.
+
+Git does not guess which version is correct. Instead, it stops the merge and asks you to decide what the final version of the file should contain.
+
+The basic process is:
+
+- Git attempts to combine the two versions.
+- If the changes do not overlap, Git merges them automatically.
+- If the changes conflict, Git marks the conflicting section.
+- You edit the file and decide what to keep.
+- You save the corrected file.
+- You stage and commit the resolved version.
+
+### Example
+
+- Suppose the student has a file called Analysis.qmd. 
+- The students is editing the file with the text: "We use stock prices from Yahoo Finance"
+- But before the student pulls the latest version the instructor is editing the same line with "We use adjusted stock prices from Yahoo Finance"
+- The student pulls the repo
+- Git may produce a conflict. You will get a merge conflict warning along with the list of file(s) that are conflicted. 
+
+R Studio
+
+- After the failed pull, open the Git pane
+- The conflicted fill will appear
+- Its status should be unmerged of conflicted
+- Click that file to open in the editor
+- Inside the file Git will insert conflict markers such as: 
+```text
+<<<<<<< HEAD
+We use daily stock prices from Yahoo Finance.
+=======
+We use adjusted daily stock prices from Yahoo Finance.
+>>>>>>> origin/main
+```
+- The first block is your local version.  The second block is the version coming from GitHub
+- To resolve the conflict, edit the file as you desire. 
+- Remove all of the conflict markers: <<<, ====, >>>>>
+- Save the file
+- In the git pane, check the box next to the resolved file to Stage it
+- Click commit
+- Enter a commit message
+- Commit the change
+- Push the change
+
+Positron
+
+- Similar to the above, but somewhat more visual
+- After the failed pull, open the source control panel
+- Look under the Merge Changes or conflicted files
+- Click the conflicted file
+- Depending upon your version you shoudl see controls such as "accept current change", "accept incoming change", "accept both changes"
+- You can also edit manually
+- Once you are satisfied, save the file, return to source control, and stage the resolved file
+- Enter a commit message
+- Commit
+- Push the change
+
+
+
+
+
+## Version Control Best Practices
+
+- Never commit sensitive information; e.g. don't put API keys in public repo
+- Small commits are better than large commits; e.g.
+  - Bad: Fix plot
+  - Better: commit 1: fixed axes plotting bug; commit 2: auto-updated date in title, etc..
+- Use descriptive commit messages:
+  - Bad: update
+  - Better: Engineered data for m/m % delta
+- Data Storage
+  - Git storage capacity is typically XXX.
+
+
+
+# Project Design Best Practices
+
+## Product Design
+
+Think like a start-up founder
+
+- Customer
+- Problem
+- Their current solution
+- Your solution
+- Why is your solution better?
+- Wireframes
+
+## Project Design Best Practices
+
+- Whiteboard before keyboard
+  - Always think and artchitect the project's methodology, coding structure, and goals before you start coding
+- Folder Architecture
+  - Always include README
+  - Standard Repo's include: data, supporting, code, production
+- Code Schematic
+  - Visual guide of workflow
+  - Think of your project as a machine. Map out how data enters the machine, how it is transformed, and how it is output.
+
+# Coding Best Practices
+
+## Housekeeping Best Practices
+
+- Get into the habit of clearing memory and console at the top of every QMD
+- Use a SetUp file to install and invoke packages and define any other global variables used throughout the project.
+- Configuration for local files should be done near the top of the file within housekeeping; e.g. Define params as a list containing start_date, end_date, etc..
+
+## Avoid Hard Coding Values
+
+- E.g. you might need the starting date of your data repeatedly; during data acquisition, EDA, viz, etc…
+- Best practice is to define a start_date object and use that throughout the code.
+- Doing so permit easy code editing and facilitates object orientation; e.g. converting code to a function and looping
+
+## Object Naming Conventions
+
+- Use descriptive names whenever possible; e.g. returns_trainingset, not data
+- Use standard name for temporary data objects; e.g. “temp”
+- Don’t carry “temp” across chunks
+- Delete temp before saving workspace
+
+## Paths
+
+- Absolute paths: “C:\Users\mda3\\MyDocument”
+- Relative paths: “.\FDS-2026”
+- Relative paths permit
+  - Easy referencing of code and data files within the project
+  - Transfer of project to a different machine
+  - Situation to avoid: you ship your production code to your client, but your absolute path is mapping to your machine, and so they can’t run anything.
+
+## Code Comments
+
+- Professional grade code commentary should be motivated by someone having never seen your code and who is not code native being able to read and understand what’s happening.
+- Every code chunk should have a description of it’s execution and purpose.
+- Smaller code chunks generally lead to better commentary.
+- Within a quarto environment you can chunk within the code block or within the qmd directly. The former is useful for research purposes, the later is useful for production.
+
+## File Naming
+
+- Myriad philosophies.
+- I like to use filename_v1.qmd, filename_v2.qmd, etc..
+- I commit and push changes to each version.
+- I switch to the next version number to reflect major changes in the code.\
+- I keep the “filename.qmd” as the final production version.
+- If file dependencies are important (e.g. linking functions, etc..), then you can always have the most recent edition saved without version number.
+
+## Data Handling
+
+- Never overwrite your raw data
+  - If you transform or append in local memory, then save as a new file
+- Always save the "data" folder in the root directory for easy access
+
+# Workflow Specific to FDS Course
+
+## Before Class
+
+- Instructor commits and pushes skeletons and supplements to coure repo
+- Student pulls the repo to local machine
+
+## During Class
+
+- Student copies skeleton files to the "classexercise" folder in their personal repo
+- Student works to complete the skeleton along with the class
+- Student commits and pushes their work to their repo before the end of class
+
+## Assignments
+
+- Research Notebook and Development Notebook are submitted to the CourseProject folder within the personal repos at the designated due dates and times.
