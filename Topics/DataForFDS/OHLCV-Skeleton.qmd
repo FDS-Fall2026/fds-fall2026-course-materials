@@ -1,0 +1,306 @@
+---
+title: "OHLCV"
+subtitle: "Data For Financial Data Science"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+engine: knitr
+execute:
+  warning: false
+  echo: true
+  enabled: false # use to false when executing "skeletons" to avoid issues with incomplete code chunks
+---
+
+
+
+```{r}
+#| echo: true
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Data Acquisition Exercises
+
+## Excel
+
+- Open MSFT Excel
+  - Navigate to Data -\> Data Types. If you see "Stocks" you should be able to proceed. Usually available for MSFT 365 accounts on Windows and MAC.
+- Type CAT in cell A1
+- With cursor on CAT hit the Stocks button
+- Select CATERPILLAR in the Data Selector bar on the right
+- Hover over sell A1 and hit the Insert Data box.
+- Click previous close
+
+## Web via Investing.com
+
+- Visit https://www.investing.com/
+- Create a free account
+- Search for CAT
+- Click Historical Data
+- Daily
+  - Note that the default frequency is Daily. If not, switch to daily.
+  - Alter the date range to 1Dec2025 through 31Dec2025
+  - Download that data
+- Monthly
+  - Switch the Time Frame to Monthly
+  - Set the range from 1Dec2025 through 31Dec2025
+  - Download that data
+- Excel
+  - Create an Excel file called CAT
+  - Create a sheet called Daily and paste the daily CAT prices starting in cell A1
+  - Create a sheet called Comparison, and paste in the daily prices and nearby paste the monthly prices
+- Comparison
+  - Reconcile "Price" from Monthly with "Price" from Daily
+  - Reconcile "Open" from Monthly with "Open" from Daily
+  - Reconcile "High" from Monthly with "High" from Daily
+  - Reconcile "Low" from Monthly with "Low" from Daily
+  - Solutions??? 
+  - Load the data from the Daily sheet into R
+
+
+Task: Set path to Data folder and CAT xlsx file
+
+```{r}
+path_cat <- here("?", "?")
+```
+
+Task: use read_excel to pull the Daily sheet
+
+```{r}
+CAT_Excel <- ?(path_cat, sheet = "?")
+```
+
+## API via Yahoo Finance
+
+Goal: Acquire a historical time series of stock prices via Yahoo Finance API.
+
+Architecture:
+
+- Ensure quantmod is invoked
+- Set date range
+- Set ticker
+- Call API
+
+Task: Use requireNamespace to ensure quantmod is installed. Use isNamespaceload to ensure quantmod library is invoked. These should both return TRUE since we ran our housekeeping earlier.
+
+```{r}
+print(requireNamespace("quantmod", quietly = TRUE))
+print(isNamespaceLoaded("quantmod")
+)
+```
+
+Task: Create an empty list objecct to store our parameters
+
+```{r}
+params <- ?
+```
+
+Task: Set a date range to start 1Jan2025 and end 31Dec2025. Note that dates are typically entered yyymmdd. Add start and end to params
+
+```{r}
+params$start <- "2025-01-01"
+params$? <- "2025-12-31"
+```
+
+Task: Set the ticker to CAT and add to params
+
+```{r}
+ticker = "?"
+params$ticker<-?
+```
+
+Task: Call to API via getSymbols
+
+```{r}
+?(params$ticker,from=params$start,to=params$end,src="yahoo")
+```
+
+Task: Display the first 10 rows. Also display the last 10 rows.
+
+```{r}
+head(?)
+tail(?)
+```
+
+Task: display the data for 12/30/2025 from the Excel upload
+
+```{r}
+target_date <- ymd("2025-12-30")
+CAT_Excel %>% filter(Date ??)
+
+```
+
+Task: Display the data for 12/30/2025 from the Yahoo Finance API dataset
+
+```{r}
+CAT?
+```
+
+"What would the price history look like if dividends and splits had never created mechanical jumps?"
+
+```{r}
+CAT$AdjFactor <- CAT$CAT.Adjusted / CAT$CAT.Close
+
+head(CAT[, c("CAT.Close", "CAT.Adjusted", "AdjFactor")])
+```
+
+# Exploring Adjusted Close
+
+Q: What is the meaning of "Adjusted Close"?
+
+A: ?
+
+## Case A
+
+Assume the stock drops from 100 on 1/16/26 to 99 on 1/20/26, and that a 1 dividend was received on 1/20/26.
+
+Q: What is the adjusted closing price on each day? Explain.
+
+A:
+
+?
+
+## Case B
+
+Assume a stock drops from 100 on 1/16/26 to 97.5 on 1/20/26, and that a 1 dividend was received on 1/20/26.
+
+Q: What is the adjusted closing price on each day? Explain.
+
+A:
+
+?
+
+## CAT's Dividend
+
+From CAT's website https://investors.caterpillar.com/stock-info/dividend-history/default.aspx we know there was a \$1.510 per share dividend on 1/20/206. Let's use that to understand the meaning of Adjusted Closing Price in practice.
+
+Task: Grab CAT from 12/31/2025 through 1/31/2026
+
+```{r}
+params$start = "2025-12-31"
+params$end = "?"
+getSymbols(params$?,from=params$start,to=params$end,src="yahoo")
+```
+
+Task: Convert to a data frame and add a date
+
+```{r}
+CAT_df <- as.data.frame(CAT)
+CAT_df <- tibble::rownames_to_column(CAT_df, var = "Date")
+CAT_df$Date <- as.Date(CAT_df$Date)
+```
+
+Task: Create a Dividend column of 1.51 for the appropriate date
+
+```{r}
+
+CAT_df <- CAT_df %>%
+  ?(
+    Dividend = if_else(Date == as.Date("2026-01-20"), ?, 0)
+  )
+```
+
+Task: Create a column that computes the Delta in the Close price
+
+```{r}
+CAT_df <- CAT_df %>%
+    mutate( 
+      CloseDelta = CAT.Close - ?(CAT.Close)
+    )
+```
+
+Task: Create a column for the Wealth, assuming the investor owns one share
+
+```{r}
+CAT_df <- CAT_df %>%
+  mutate(
+    ? = CAT.Close + Dividend
+  )
+```
+
+Task: Create a column for the Delta in Wealth
+
+```{r}
+CAT_df <- CAT_df %>%
+  mutate(
+    WealthDelta = Wealth - ?
+  )
+```
+
+Task: Create a column for the Delta in the Adjusted Close
+
+```{r}
+CAT_df <- CAT_df %>%
+  mutate(
+    AdjDelta = CAT.Adjusted - ?
+  )
+```
+
+Task: Filter on the dates 1/16 and 1/20 and display the Date, Close, Close Delta, Wealth, Wealth Delta, Adjusted, and Adjusted Delta
+
+```{r}
+CAT_window <- CAT_df %>%
+  filter(Date %in% as.Date(c("2026-01-16", "2026-01-20")))%>%
+  dplyr::select(Date,CAT.Close,CloseDelta,Wealth,WealthDelta,CAT.Adjusted,AdjDelta)
+
+CAT_window
+```
+
+Q: Explain the Adjusted Closing logic in this case.
+
+A:
+
+?
+
+## Loading Multiple Tickers
+
+Goal: Load multiple tickers and place the adjusted closing price into a wide dataframe.
+
+Task: Set the dates from 31Dec2025 through 1Jan2026
+
+```{r}
+params$start <- "2025-12-31"
+params$end   <- "2026-01-31"
+```
+
+Task: Create a character vector for AAPL, CAT, AMZN
+
+```{r}
+tickers <- ?
+```
+
+Task: Download all series
+
+```{r}
+getSymbols(
+  Symbols = ?,
+  from = params$start,
+  to = params$end,
+  src = "yahoo"
+)
+```
+
+Task: Merge adjusted closes into one xts object
+
+```{r}
+AdjPrices <- do.call(
+  merge,
+  lapply(tickers, function(x) Ad(get(x)))
+)
+```
+
+Task: Rename columns with the ticker names
+
+```{r}
+?(AdjPrices) <- tickers
+
+AdjPrices
+```
