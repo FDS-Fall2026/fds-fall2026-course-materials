@@ -46,7 +46,6 @@ This list is not comprehensive, but useful:
   - [R Studio](https://posit.co/downloads)
   - [Positron](https://positron.posit.co/download) --- Note: Positron supports R and Python
 
-
 ## Verifying R
 
 - Test your IDE
@@ -78,9 +77,9 @@ Positron
   - Save filename as \_quarto.yml
 - Wherever you place that yml is the root working directory for this project, permitting you to use relative path referencing e.g. read.csv("./Data/fakedata.csv")
 
-Task: 
+Task:
 
-- Set your working directory in your preferred IDE 
+- Set your working directory in your preferred IDE
 - Enter getwd() in the console to verify the working directory is where you intended
 
 # Git
@@ -95,14 +94,15 @@ Don't do:
 - Final_v2.R
 - Final_v2_last.R
 
-Why? 
+Why?
 
 1.  Confusion over version ordering; "which is the final version?"
 2.  Can't answer: "I need to revert back to the version that had my original approach. Which is that?""
 3.  Poor naming convention is unprofessional delivery to clients
 
 ## Version Control Tools
-A version control system includes proper naming convention and tools to track and manage changes.  
+
+A version control system includes proper naming convention and tools to track and manage changes.
 
 - Git: version control system
   - Tracks changes to files (not just code)
@@ -114,18 +114,18 @@ A version control system includes proper naming convention and tools to track an
   - Synchronizes work across multiple computers
   - Facilitates collaboration
   - Adds features beyond Git itself (pull requests, code review, GitHub Actions, Classroom, Organizations, etc.)
-- GitHub Desktop: 
+- GitHub Desktop:
   - Local interface to GitHub
 
-## Installation 
+## Installation
 
-### GitHub 
+### GitHub
 
 - Create a free GitHub account.
 - [Sign Up](https://github.com/signup)
 - Please use your duke email.
 
-### Git 
+### Git
 
 - Install Git
 - [Download](https://git-scm.com/install/)
@@ -134,32 +134,30 @@ A version control system includes proper naming convention and tools to track an
 
 - (Download)\[https://desktop.github.com/download/\]
 
-
 ## Connection to IDE
-You can interact with GitHub entirely via the Web GUI by downloading the repo, making changes, and uploading the changes.  
 
-Another approach is to integrate GitHub directly into your IDE. 
+You can interact with GitHub entirely via the Web GUI by downloading the repo, making changes, and uploading the changes.
+
+Another approach is to integrate GitHub directly into your IDE.
 
 ### Connect Git to R Studio
 
-- Tools -> Git/SVN
+- Tools -\> Git/SVN
 - Check the box "Enable version control interface for RStudio projects"
 - (Optional) check box of "Sign git commits"
-- Git executable: Find the executable for Git on your machine.  Sometimes this is tricky.  Here are two examples
+- Git executable: Find the executable for Git on your machine. Sometimes this is tricky. Here are two examples
   - C:\Program Files\Git\cmd\git.exe
   - C:/Users/mda3/AppData/Local/GitHubDesktop/app-3.6.2/resources/app/git/cmd/git.exe
 - Click Apply
-- To verify if Git was activated, go to File -> New Project -> Version Control.  You should see Git as an option. 
-
+- To verify if Git was activated, go to File -\> New Project -\> Version Control. You should see Git as an option.
 
 ### Connect GitHub to Positron
 
-- File -> Preferences -> Settings
-- Search for Git: Enabled, which should be check on. Positron should detect Git automatically. 
+- File -\> Preferences -\> Settings
+- Search for Git: Enabled, which should be check on. Positron should detect Git automatically.
 - If Positron can't find Git, then search for Git: Path and edit the json
 
-
-## Verifying Access to Class Organization 
+## Verifying Access to Class Organization
 
 - All registered students should have access to the FDS-Fall2026 organization
 - Log into GitHub with your Duke email
@@ -168,12 +166,11 @@ Another approach is to integrate GitHub directly into your IDE.
 - You should see FDS-Fall2026
 - If you don't, please let the instructional staff known ASAP
 
-
 ## Connecting to Class Repo
 
-The repo fds-fall2026-course-materials contains all the documents that I will share with you during the semester.  These documents will evolve over time.  You only have "read access" to this repo.  
+The repo fds-fall2026-course-materials contains all the documents that I will share with you during the semester. These documents will evolve over time. You only have "read access" to this repo.
 
-You have two options to acquire the latest versions. 
+You have two options to acquire the latest versions.
 
 ### Option 1 (via web GUI)
 
@@ -181,15 +178,16 @@ You have two options to acquire the latest versions.
 - Go to the fds-fall2026-course-materials repo
 - Click on the green "Code" button
 - Click Download ZIP
-- Unzip on your machine 
+- Unzip on your machine
 - Repeat for every update to the repo
 
 ### Option 2 (Connect to GitHub via your IDE)
+
 Cloning creates a local copy of the repository on your computer and maintains a connection to the GitHub repository.
 
 You only need to clone the repository once. After that, use Pull to retrieve updates during the semester.
 
-RStudio: 
+RStudio:
 
 - On GitHub, navigate to the fds-fall2026-course-materials repository.
 - Click the green Code button.
@@ -201,7 +199,7 @@ RStudio:
 - Choose the folder on your computer where you want the course repository stored.
 - Click Create Project.
 
-You only need to clone the project once.  
+You only need to clone the project once.
 
 Whenever you want the latest course materials
 
@@ -209,8 +207,7 @@ Whenever you want the latest course materials
 - Go to the Git pane (should show up in the toolbar to the left of "Add Ins")
 - Click Pull
 
-
-Positron: 
+Positron:
 
 - On GitHub, navigate to the fds-fall2026-course-materials repository.
 - Click the green Code button.
@@ -218,13 +215,13 @@ Positron:
 - Copy the repository URL.
 - Open Positron.
 - Open the Command Palette:
-  - Windows: Ctrl + Shift + P | macOS: Cmd + Shift + P
+  - Windows: Ctrl + Shift + P \| macOS: Cmd + Shift + P
   - Search for and select: Git: Clone
 - Paste the GitHub repository URL.
 - Select the location on your computer where you want the repository stored.
 - When prompted, select Open to open the cloned repository in Positron.
 
-You only need to clone the project once.  
+You only need to clone the project once.
 
 Whenever you want the latest course materials
 
@@ -232,24 +229,23 @@ Whenever you want the latest course materials
 - Open the Source Control panel (the icon in left toolbar that looks like several connected dots)
 - Click the three dots ... and select Pull
 
-
 ### Testing Class Repo Connection
 
-- Let's test your connection.  
+- Let's test your connection.\
 - Clone the class repo as per the instructions above
 - Pull the latest edition
 - The instructor will make a minor edit to the README
 - Pull again and notice the changes your your local machine
 
-
 ## Student Private Repo
-You will submit class materials via GitHub within your own private repo. 
+
+You will submit class materials via GitHub within your own private repo.
 
 - Go to GitHub.com and log in with your Duke email
-- Go to the course organization 
+- Go to the course organization
 - Click New Repository
 - Under Owner, ensure that you select the FDS-Fall2026 organization and not your personal GitHub account
-- Use the following name convention.  Mike Aguilar's repo for the 20206 FDS course would be MikeAguilar-FDS-Fall2026.  
+- Use the following name convention. Mike Aguilar's repo for the 20206 FDS course would be MikeAguilar-FDS-Fall2026.\
 - Under visibility, select Private
 - Select "add README", but you don't need to add licensce or gitignore
   - Note: gitignore indicates which files/folders not to track
@@ -259,22 +255,21 @@ You will submit class materials via GitHub within your own private repo.
 
 - Clone Personal Repo as per the instructions above
 - Pull Personal Repo
-- Create a folder called "ClassExercises", which you can use to store any class exercises.  
-- Create a folder called "CourseProject", which you can use to store code and deliverables associated with your course project.  
+- Create a folder called "ClassExercises", which you can use to store any class exercises.\
+- Create a folder called "CourseProject", which you can use to store code and deliverables associated with your course project.\
 - Commit the change
 - Push the change
 - Visit GitHub on the web to confirm the change
 
 ## Managing Conflicts
-If you are working across multiple machines or with teammates, conflicts within the code may occur. 
+
+If you are working across multiple machines or with teammates, conflicts within the code may occur.
 
 A merge conflict occurs when Git cannot determine automatically how to combine two different versions of the same file.
 
 This most often happens when:
 
-two people edit the same lines of the same file,
-you make local changes while someone else changes the GitHub version,
-you pull changes from GitHub that overlap with your own uncommitted or committed work.
+two people edit the same lines of the same file, you make local changes while someone else changes the GitHub version, you pull changes from GitHub that overlap with your own uncommitted or committed work.
 
 Git does not guess which version is correct. Instead, it stops the merge and asks you to decide what the final version of the file should contain.
 
@@ -289,11 +284,11 @@ The basic process is:
 
 ### Example
 
-- Suppose the student has a file called Analysis.qmd. 
+- Suppose the student has a file called Analysis.qmd.
 - The students is editing the file with the text: "We use stock prices from Yahoo Finance"
 - But before the student pulls the latest version the instructor is editing the same line with "We use adjusted stock prices from Yahoo Finance"
 - The student pulls the repo
-- Git may produce a conflict. You will get a merge conflict warning along with the list of file(s) that are conflicted. 
+- Git may produce a conflict. You will get a merge conflict warning along with the list of file(s) that are conflicted.
 
 R Studio
 
@@ -301,17 +296,19 @@ R Studio
 - The conflicted fill will appear
 - Its status should be unmerged of conflicted
 - Click that file to open in the editor
-- Inside the file Git will insert conflict markers such as: 
-```text
+- Inside the file Git will insert conflict markers such as:
+
+``` text
 <<<<<<< HEAD
 We use daily stock prices from Yahoo Finance.
 =======
 We use adjusted daily stock prices from Yahoo Finance.
 >>>>>>> origin/main
 ```
-- The first block is your local version.  The second block is the version coming from GitHub
-- To resolve the conflict, edit the file as you desire. 
-- Remove all of the conflict markers: <<<, ====, >>>>>
+
+- The first block is your local version. The second block is the version coming from GitHub
+- To resolve the conflict, edit the file as you desire.
+- Remove all of the conflict markers: \<\<\<, ====, \>\>\>\>\>
 - Save the file
 - In the git pane, check the box next to the resolved file to Stage it
 - Click commit
@@ -332,10 +329,6 @@ Positron
 - Commit
 - Push the change
 
-
-
-
-
 ## Version Control Best Practices
 
 - Never commit sensitive information; e.g. don't put API keys in public repo
@@ -348,31 +341,244 @@ Positron
 - Data Storage
   - Git storage capacity is typically XXX.
 
+# Project Planning and Design
+
+Before writing code, spend time determining **what should be built and how the major components should fit together**. A well-designed project begins with a clearly defined problem and a preliminary plan for solving it.
+
+The design will almost certainly evolve as you learn more about the data, analytical methods, and stakeholder needs. The objective is not to perfectly specify the project in advance. Rather, it is to avoid beginning implementation without a clear understanding of the problem, intended product, and major components of the solution.
+
+## Finding the Right Project
+
+Stakeholders seldom tell you exactly what the final product should look like. More commonly, they have a problem, objective, or decision that they would like to improve. Part of the data scientist's job is to translate that relatively broad objective into a specific and feasible analytical product.
+
+One useful approach is to think like a start-up founder. Before building anything, be able to answer:
+
+* **Who is the customer or user?**
+
+  * Who will actually use the product or its outputs?
+* **What problem are they trying to solve?**
+
+  * Be specific about the decision, task, or analytical question.
+* **How do they currently solve the problem?**
+
+  * The relevant comparison is often not "nothing," but an existing spreadsheet, report, website, model, or manual process.
+* **What is your proposed solution?**
+
+  * What will the product actually do?
+* **Why is your solution better?**
+
+  * Will it be faster, more informative, more accurate, easier to use, more automated, or provide information that is otherwise unavailable?
+* **What should the user experience look like?**
+
+  * Sketch preliminary wireframes showing how the user will interact with the product and its results.
+* **How will the product be delivered?**
+
+  * For example, will it be a dashboard, report, application, API, or some combination?
+* **What constitutes success?**
+
+  * Identify observable criteria that would allow you to determine whether the product successfully addresses the original problem.
+
+This exercise helps prevent a common failure mode in data science projects: **starting with an interesting dataset or analytical method and only later searching for a problem to which it might be applied.** Whenever possible, begin with the problem and then select the data and methods required to address it.
+
+## Designing the Analytical Solution
+
+Once the problem and proposed product are reasonably clear, design the broad structure of the solution before beginning substantial implementation.
+
+### Whiteboard Before Keyboard
+
+A useful rule is **whiteboard before keyboard**.
+
+Before writing substantial code, think through:
+
+* What data are required?
+* How will the data be acquired and prepared?
+* What analytical methods will be applied?
+* What outputs will those methods produce?
+* How will those outputs reach the user?
+* What are the major components of the code base?
+* How will the components interact?
+
+The objective is not to specify every implementation detail in advance. Rather, identify the major pieces of the system and the logical relationships among them.
+
+### Analytical Schematics
+
+An **analytical schematic** summarizes the flow of the analysis.
+
+For example:
+
+> Raw Data → Data Cleaning → Feature Engineering → Model → Evaluation → Visualization → User Output
+
+The schematic can be a simple hand drawing, flowchart, or one-page collection of boxes and arrows. The format is less important than forcing yourself to articulate the sequence of the analysis.
+
+A useful analytical schematic should make clear:
+
+* Major inputs and data sources.
+* Important transformations.
+* Analytical or modeling stages.
+* Outputs produced at each stage.
+* How those outputs contribute to the final product.
+
+Creating the schematic often reveals missing steps, unclear dependencies, or unnecessary complexity before substantial code has been written.
+
+### Code and System Schematics
+
+A **code or system schematic** describes how the implementation will be organized.
+
+Rather than describing the analytical sequence, it identifies major components of the code base and how they interact. For example:
+
+> Data Acquisition Module → Data Processing Module → Analytics Engine → Visualization Module → User Interface
+
+This can help determine:
+
+* Which functionality belongs in separate scripts or modules.
+* Which tasks should be implemented as reusable functions.
+* Where data should enter and leave different components.
+* Which components depend on one another.
+* Where external APIs, databases, models, and user-interface elements belong.
+
+The analytical and code schematics answer different questions:
+
+* **Analytical schematic:** *What steps transform the original data into useful information?*
+* **Code/system schematic:** *How should the software be organized to implement those steps?*
+
+Both will evolve during development. Their purpose is not to lock the project into an initial design, but to provide a coherent starting point that can be revised deliberately as the project develops.
 
 
-# Project Design Best Practices
+# Project Management 
 
-## Product Design
+Project management is a field unto itself. Effectively managing a financial data science project, or any substantial analytical project, requires planning, prioritization, and discipline.
 
-Think like a start-up founder
+Team projects introduce additional challenges related to coordination, communication, and division of responsibilities. The practices below focus primarily on the individual course project, although many also apply to team-based work.
 
-- Customer
-- Problem
-- Their current solution
-- Your solution
-- Why is your solution better?
-- Wireframes
+## Start with the Final Deadline
 
-## Project Design Best Practices
+Begin by identifying the date on which the final product must be delivered to your client, manager, instructor, or other stakeholder.
 
-- Whiteboard before keyboard
-  - Always think and artchitect the project's methodology, coding structure, and goals before you start coding
-- Folder Architecture
-  - Always include README
-  - Standard Repo's include: data, supporting, code, production
-- Code Schematic
-  - Visual guide of workflow
-  - Think of your project as a machine. Map out how data enters the machine, how it is transformed, and how it is output.
+Then work backward from that date.
+
+* Do not plan to finish the project on the deadline.
+* Leave time for debugging, revisions, documentation, formatting, and unexpected problems.
+* Build some flexibility into the schedule. Analytical projects rarely proceed exactly as planned.
+
+A deadline should therefore be treated as the **delivery date**, not the **target completion date**.
+
+## Establish Milestones
+
+Break the project into intermediate milestones with target completion dates.
+
+Milestones serve several purposes:
+
+* They make a large project more manageable.
+* They provide a way to determine whether the project is on schedule.
+* They create natural points for reviewing progress and identifying problems.
+* They help maintain momentum by providing shorter-term objectives.
+* They allow stakeholders to see incremental progress rather than waiting until the final submission.
+
+Whenever possible, define milestones in terms of **completed outputs**, rather than simply time spent working.
+
+For example, "complete exploratory data analysis" is a better milestone than "work on EDA for three hours."
+
+## Build a Minimum Viable Product First
+
+For each stage of the project, first aim to produce a **Minimum Viable Product (MVP)**: the simplest version that works and satisfies the essential objective.
+
+The MVP does not need to be polished. It needs to work.
+
+For example:
+
+* First produce a functioning data-cleaning pipeline; optimize it later.
+* First create a readable visualization; improve its appearance later.
+* First estimate a reasonable model; investigate alternative specifications later.
+* First generate the required output; improve formatting later.
+
+A working but imperfect analysis is usually more valuable than a partially completed analysis that has been extensively polished.
+
+## Separate Bugs from Enhancements
+
+While working toward a milestone, you will invariably identify things that could be improved.
+
+It is useful to distinguish among three types of issues:
+
+* **Bugs:** Something is incorrect or prevents the analysis from working as intended.
+* **Enhancements:** The current version works, but it could be improved.
+* **Scope changes:** New ideas or objectives that expand what the project is attempting to accomplish.
+
+Examples of enhancements might include changing the colors of a plot, adding another summary statistic, testing an additional model, or improving the formatting of a table.
+
+Do not allow nonessential enhancements to distract you from completing the current milestone. Instead, record them and return to them after the essential work is complete.
+
+Maintain a simple list of bugs, enhancements, and possible future work. This prevents useful ideas from being forgotten without requiring you to pursue every idea immediately.
+
+## Keep a Record of Your Progress
+
+At the end of each work session, record:
+
+* What you completed.
+* Any problems you encountered.
+* Decisions you made.
+* What remains unfinished.
+* The next task you should complete.
+
+This record can be as simple as a notebook entry or text file, or as formal as a research notebook or task-management system.
+
+The most important item is often the last one: **write down what you should do next**.
+
+Doing so makes it much easier to resume the project after several hours or several days away from it.
+
+## Prioritize the Critical Path
+
+Not every task is equally important.
+
+Ask whether a task is necessary for another important part of the project to proceed. Tasks that block subsequent work should generally receive priority.
+
+For example, if the modeling stage requires a cleaned analytical dataset, finishing the data pipeline is more important than polishing an exploratory visualization.
+
+Avoid spending substantial time optimizing work that is not on the project's critical path.
+
+## Make Reproducibility Part of Project Management
+
+In a data science project, successful project management also means being able to reproduce the analysis.
+
+As the project develops:
+
+* Keep raw data separate from processed data.
+* Avoid making undocumented manual changes to datasets.
+* Organize scripts and files consistently.
+* Use relative rather than machine-specific file paths whenever possible.
+* Save important assumptions and decisions in the project itself.
+* Periodically verify that the project can run from beginning to end.
+
+A project that works only because you remember a sequence of undocumented manual steps is not yet complete.
+
+## Manage Scope Deliberately
+
+Analytical projects naturally generate new questions. Some are valuable, but pursuing every interesting idea can prevent the original project from being completed.
+
+When considering additional work, ask:
+
+1. Is it necessary to answer the primary question?
+2. Is it necessary for the current milestone?
+3. Is the likely benefit worth the required time?
+4. Can it be placed on the enhancement list instead?
+
+Complete the core project before expanding its scope.
+
+## Leave Time for Integration
+
+Individual components may work correctly while the complete project does not.
+
+Before the final deadline, reserve time to run the project from beginning to end and verify that:
+
+* Data are loaded correctly.
+* Code executes in the proper order.
+* Tables and figures are generated correctly.
+* Results reported in the narrative match the underlying analysis.
+* Files, links, paths, and references work.
+* The final deliverable is understandable to someone who did not build it.
+
+The final stage of a project should therefore include **integration and quality control**, not simply additional analysis.
+
+
 
 # Coding Best Practices
 
@@ -425,6 +631,26 @@ Think like a start-up founder
 - Never overwrite your raw data
   - If you transform or append in local memory, then save as a new file
 - Always save the "data" folder in the root directory for easy access
+
+## Debugging 
+
+- Some begugging is simple.  It's focused on a specific line of code and it's solution is a slight modification of syntax. 
+- Debugging could also be more complicated. The issue might impact your entire code base and structural design of your project.  The issue might be about the code itself or the data, finance theory, or analytical tools being deployed. 
+  - Trap: You encounter the error.  You search for an answer.  You try to implement the first (possible) solution that presents itself.  But i) is that the most efficient solution? ii) will that solution impact other aspects of your code base. 
+  - Trap: You encounter the error.  You search for an answer.  You attempt to implement, but it's not working right away.  You search for another solution.  You attempt to implement, again without success.  You oscillate between these approaches, without developing a solution. 
+- A few Best Practices
+  - Articulate the error; Write it down.  
+  - Understand the error; What is the cause of the error? What other asspects of the code base might be impacted? 
+  - Identify potenial solutions; Compile a list of at least 2-3 possible solutions.  
+  - Evaluate the potential solutions; Evaluate the costs/benefits of each potential solution and rank order. 
+  - Implement the potential solutions; Start with the highest ranked solution.  Dedicate time and energy ony to implementing that solution.  Don't move onto the second best potential solution until you've exhausted the first one as a viable candidate.  
+
+## Folder Architecture
+  
+- Always include README
+- Standard Repo's include: data, supporting, code, production
+
+
 
 # Workflow Specific to FDS Course
 
