@@ -7,6 +7,7 @@ editor: visual
 toc: true
 toc-depth: 5
 toc-location: left
+collapse: true
 embed-resources: true
 engine: knitr
 execute:
@@ -123,7 +124,7 @@ A version control system includes proper naming convention and tools to track an
 
 - Create a free GitHub account.
 - [Sign Up](https://github.com/signup)
-- Please use your duke email.
+- Please use your duke email. Use your full alias, not netID; eg mike.aguilar\@duke.edu, not mda22\@duke.edu
 
 ### Git
 
@@ -132,7 +133,7 @@ A version control system includes proper naming convention and tools to track an
 
 ### GitHub Desktop (Optional)
 
-- (Download)\[https://desktop.github.com/download/\]
+- [Download](https://desktop.github.com/download/)
 
 ## Connection to IDE
 
@@ -353,30 +354,37 @@ Stakeholders seldom tell you exactly what the final product should look like. Mo
 
 One useful approach is to think like a start-up founder. Before building anything, be able to answer:
 
-* **Who is the customer or user?**
+- **Who is the customer or user?**
 
-  * Who will actually use the product or its outputs?
-* **What problem are they trying to solve?**
+  - Who will actually use the product or its outputs?
 
-  * Be specific about the decision, task, or analytical question.
-* **How do they currently solve the problem?**
+- **What problem are they trying to solve?**
 
-  * The relevant comparison is often not "nothing," but an existing spreadsheet, report, website, model, or manual process.
-* **What is your proposed solution?**
+  - Be specific about the decision, task, or analytical question.
 
-  * What will the product actually do?
-* **Why is your solution better?**
+- **How do they currently solve the problem?**
 
-  * Will it be faster, more informative, more accurate, easier to use, more automated, or provide information that is otherwise unavailable?
-* **What should the user experience look like?**
+  - The relevant comparison is often not "nothing," but an existing spreadsheet, report, website, model, or manual process.
 
-  * Sketch preliminary wireframes showing how the user will interact with the product and its results.
-* **How will the product be delivered?**
+- **What is your proposed solution?**
 
-  * For example, will it be a dashboard, report, application, API, or some combination?
-* **What constitutes success?**
+  - What will the product actually do?
 
-  * Identify observable criteria that would allow you to determine whether the product successfully addresses the original problem.
+- **Why is your solution better?**
+
+  - Will it be faster, more informative, more accurate, easier to use, more automated, or provide information that is otherwise unavailable?
+
+- **What should the user experience look like?**
+
+  - Sketch preliminary wireframes showing how the user will interact with the product and its results.
+
+- **How will the product be delivered?**
+
+  - For example, will it be a dashboard, report, application, API, or some combination?
+
+- **What constitutes success?**
+
+  - Identify observable criteria that would allow you to determine whether the product successfully addresses the original problem.
 
 This exercise helps prevent a common failure mode in data science projects: **starting with an interesting dataset or analytical method and only later searching for a problem to which it might be applied.** Whenever possible, begin with the problem and then select the data and methods required to address it.
 
@@ -390,13 +398,13 @@ A useful rule is **whiteboard before keyboard**.
 
 Before writing substantial code, think through:
 
-* What data are required?
-* How will the data be acquired and prepared?
-* What analytical methods will be applied?
-* What outputs will those methods produce?
-* How will those outputs reach the user?
-* What are the major components of the code base?
-* How will the components interact?
+- What data are required?
+- How will the data be acquired and prepared?
+- What analytical methods will be applied?
+- What outputs will those methods produce?
+- How will those outputs reach the user?
+- What are the major components of the code base?
+- How will the components interact?
 
 The objective is not to specify every implementation detail in advance. Rather, identify the major pieces of the system and the logical relationships among them.
 
@@ -412,11 +420,11 @@ The schematic can be a simple hand drawing, flowchart, or one-page collection of
 
 A useful analytical schematic should make clear:
 
-* Major inputs and data sources.
-* Important transformations.
-* Analytical or modeling stages.
-* Outputs produced at each stage.
-* How those outputs contribute to the final product.
+- Major inputs and data sources.
+- Important transformations.
+- Analytical or modeling stages.
+- Outputs produced at each stage.
+- How those outputs contribute to the final product.
 
 Creating the schematic often reveals missing steps, unclear dependencies, or unnecessary complexity before substantial code has been written.
 
@@ -430,21 +438,20 @@ Rather than describing the analytical sequence, it identifies major components o
 
 This can help determine:
 
-* Which functionality belongs in separate scripts or modules.
-* Which tasks should be implemented as reusable functions.
-* Where data should enter and leave different components.
-* Which components depend on one another.
-* Where external APIs, databases, models, and user-interface elements belong.
+- Which functionality belongs in separate scripts or modules.
+- Which tasks should be implemented as reusable functions.
+- Where data should enter and leave different components.
+- Which components depend on one another.
+- Where external APIs, databases, models, and user-interface elements belong.
 
 The analytical and code schematics answer different questions:
 
-* **Analytical schematic:** *What steps transform the original data into useful information?*
-* **Code/system schematic:** *How should the software be organized to implement those steps?*
+- **Analytical schematic:** *What steps transform the original data into useful information?*
+- **Code/system schematic:** *How should the software be organized to implement those steps?*
 
 Both will evolve during development. Their purpose is not to lock the project into an initial design, but to provide a coherent starting point that can be revised deliberately as the project develops.
 
-
-# Project Management 
+# Project Management
 
 Project management is a field unto itself. Effectively managing a financial data science project, or any substantial analytical project, requires planning, prioritization, and discipline.
 
@@ -456,9 +463,9 @@ Begin by identifying the date on which the final product must be delivered to yo
 
 Then work backward from that date.
 
-* Do not plan to finish the project on the deadline.
-* Leave time for debugging, revisions, documentation, formatting, and unexpected problems.
-* Build some flexibility into the schedule. Analytical projects rarely proceed exactly as planned.
+- Do not plan to finish the project on the deadline.
+- Leave time for debugging, revisions, documentation, formatting, and unexpected problems.
+- Build some flexibility into the schedule. Analytical projects rarely proceed exactly as planned.
 
 A deadline should therefore be treated as the **delivery date**, not the **target completion date**.
 
@@ -468,11 +475,11 @@ Break the project into intermediate milestones with target completion dates.
 
 Milestones serve several purposes:
 
-* They make a large project more manageable.
-* They provide a way to determine whether the project is on schedule.
-* They create natural points for reviewing progress and identifying problems.
-* They help maintain momentum by providing shorter-term objectives.
-* They allow stakeholders to see incremental progress rather than waiting until the final submission.
+- They make a large project more manageable.
+- They provide a way to determine whether the project is on schedule.
+- They create natural points for reviewing progress and identifying problems.
+- They help maintain momentum by providing shorter-term objectives.
+- They allow stakeholders to see incremental progress rather than waiting until the final submission.
 
 Whenever possible, define milestones in terms of **completed outputs**, rather than simply time spent working.
 
@@ -486,10 +493,10 @@ The MVP does not need to be polished. It needs to work.
 
 For example:
 
-* First produce a functioning data-cleaning pipeline; optimize it later.
-* First create a readable visualization; improve its appearance later.
-* First estimate a reasonable model; investigate alternative specifications later.
-* First generate the required output; improve formatting later.
+- First produce a functioning data-cleaning pipeline; optimize it later.
+- First create a readable visualization; improve its appearance later.
+- First estimate a reasonable model; investigate alternative specifications later.
+- First generate the required output; improve formatting later.
 
 A working but imperfect analysis is usually more valuable than a partially completed analysis that has been extensively polished.
 
@@ -499,9 +506,9 @@ While working toward a milestone, you will invariably identify things that could
 
 It is useful to distinguish among three types of issues:
 
-* **Bugs:** Something is incorrect or prevents the analysis from working as intended.
-* **Enhancements:** The current version works, but it could be improved.
-* **Scope changes:** New ideas or objectives that expand what the project is attempting to accomplish.
+- **Bugs:** Something is incorrect or prevents the analysis from working as intended.
+- **Enhancements:** The current version works, but it could be improved.
+- **Scope changes:** New ideas or objectives that expand what the project is attempting to accomplish.
 
 Examples of enhancements might include changing the colors of a plot, adding another summary statistic, testing an additional model, or improving the formatting of a table.
 
@@ -513,11 +520,11 @@ Maintain a simple list of bugs, enhancements, and possible future work. This pre
 
 At the end of each work session, record:
 
-* What you completed.
-* Any problems you encountered.
-* Decisions you made.
-* What remains unfinished.
-* The next task you should complete.
+- What you completed.
+- Any problems you encountered.
+- Decisions you made.
+- What remains unfinished.
+- The next task you should complete.
 
 This record can be as simple as a notebook entry or text file, or as formal as a research notebook or task-management system.
 
@@ -541,12 +548,12 @@ In a data science project, successful project management also means being able t
 
 As the project develops:
 
-* Keep raw data separate from processed data.
-* Avoid making undocumented manual changes to datasets.
-* Organize scripts and files consistently.
-* Use relative rather than machine-specific file paths whenever possible.
-* Save important assumptions and decisions in the project itself.
-* Periodically verify that the project can run from beginning to end.
+- Keep raw data separate from processed data.
+- Avoid making undocumented manual changes to datasets.
+- Organize scripts and files consistently.
+- Use relative rather than machine-specific file paths whenever possible.
+- Save important assumptions and decisions in the project itself.
+- Periodically verify that the project can run from beginning to end.
 
 A project that works only because you remember a sequence of undocumented manual steps is not yet complete.
 
@@ -556,10 +563,10 @@ Analytical projects naturally generate new questions. Some are valuable, but pur
 
 When considering additional work, ask:
 
-1. Is it necessary to answer the primary question?
-2. Is it necessary for the current milestone?
-3. Is the likely benefit worth the required time?
-4. Can it be placed on the enhancement list instead?
+1.  Is it necessary to answer the primary question?
+2.  Is it necessary for the current milestone?
+3.  Is the likely benefit worth the required time?
+4.  Can it be placed on the enhancement list instead?
 
 Complete the core project before expanding its scope.
 
@@ -569,16 +576,14 @@ Individual components may work correctly while the complete project does not.
 
 Before the final deadline, reserve time to run the project from beginning to end and verify that:
 
-* Data are loaded correctly.
-* Code executes in the proper order.
-* Tables and figures are generated correctly.
-* Results reported in the narrative match the underlying analysis.
-* Files, links, paths, and references work.
-* The final deliverable is understandable to someone who did not build it.
+- Data are loaded correctly.
+- Code executes in the proper order.
+- Tables and figures are generated correctly.
+- Results reported in the narrative match the underlying analysis.
+- Files, links, paths, and references work.
+- The final deliverable is understandable to someone who did not build it.
 
 The final stage of a project should therefore include **integration and quality control**, not simply additional analysis.
-
-
 
 # Coding Best Practices
 
@@ -632,25 +637,23 @@ The final stage of a project should therefore include **integration and quality 
   - If you transform or append in local memory, then save as a new file
 - Always save the "data" folder in the root directory for easy access
 
-## Debugging 
+## Debugging
 
-- Some begugging is simple.  It's focused on a specific line of code and it's solution is a slight modification of syntax. 
-- Debugging could also be more complicated. The issue might impact your entire code base and structural design of your project.  The issue might be about the code itself or the data, finance theory, or analytical tools being deployed. 
-  - Trap: You encounter the error.  You search for an answer.  You try to implement the first (possible) solution that presents itself.  But i) is that the most efficient solution? ii) will that solution impact other aspects of your code base. 
-  - Trap: You encounter the error.  You search for an answer.  You attempt to implement, but it's not working right away.  You search for another solution.  You attempt to implement, again without success.  You oscillate between these approaches, without developing a solution. 
+- Some begugging is simple. It's focused on a specific line of code and it's solution is a slight modification of syntax.
+- Debugging could also be more complicated. The issue might impact your entire code base and structural design of your project. The issue might be about the code itself or the data, finance theory, or analytical tools being deployed.
+  - Trap: You encounter the error. You search for an answer. You try to implement the first (possible) solution that presents itself. But i) is that the most efficient solution? ii) will that solution impact other aspects of your code base.
+  - Trap: You encounter the error. You search for an answer. You attempt to implement, but it's not working right away. You search for another solution. You attempt to implement, again without success. You oscillate between these approaches, without developing a solution.
 - A few Best Practices
-  - Articulate the error; Write it down.  
-  - Understand the error; What is the cause of the error? What other asspects of the code base might be impacted? 
-  - Identify potenial solutions; Compile a list of at least 2-3 possible solutions.  
-  - Evaluate the potential solutions; Evaluate the costs/benefits of each potential solution and rank order. 
-  - Implement the potential solutions; Start with the highest ranked solution.  Dedicate time and energy ony to implementing that solution.  Don't move onto the second best potential solution until you've exhausted the first one as a viable candidate.  
+  - Articulate the error; Write it down.\
+  - Understand the error; What is the cause of the error? What other asspects of the code base might be impacted?
+  - Identify potenial solutions; Compile a list of at least 2-3 possible solutions.\
+  - Evaluate the potential solutions; Evaluate the costs/benefits of each potential solution and rank order.
+  - Implement the potential solutions; Start with the highest ranked solution. Dedicate time and energy ony to implementing that solution. Don't move onto the second best potential solution until you've exhausted the first one as a viable candidate.
 
 ## Folder Architecture
-  
+
 - Always include README
 - Standard Repo's include: data, supporting, code, production
-
-
 
 # Workflow Specific to FDS Course
 
