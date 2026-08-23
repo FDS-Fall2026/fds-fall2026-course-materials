@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Course Materials Index</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { margin-bottom: 20px; }
+    ul { line-height: 1.8; }
+    .folder { font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Course Materials — HTML Index</h1>
+  <p>This page automatically lists all HTML files in the repository.</p>
+
+  <div id="content">Loading…</div>
+
+  <script>
+    const owner = "FDS-Fall2026";
+    const repo = "fds-fall2026-course-materials";
+
+    async function fetchTree() {
+      const api = `https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`;
+      const res = await fetch(api);
+      return res.json();
+    }
+
+    function buildList(tree) {
+      const htmlFiles = tree.tree.filter(item => item.path.endsWith(".html"));
+
+      let html = "<ul>";
+      htmlFiles.forEach(file => {
+        const url = `https://${owner}.github.io/${repo}/${file.path}`;
+        html += `<li><a href="${url}" target="_blank">${file.path}</a></li>`;
+      });
+      html += "</ul>";
+
+      return html;
+    }
+
+    fetchTree().then(tree => {
+      document.getElementById("content").innerHTML = buildList(tree);
+    });
+  </script>
+</body>
+</html>
