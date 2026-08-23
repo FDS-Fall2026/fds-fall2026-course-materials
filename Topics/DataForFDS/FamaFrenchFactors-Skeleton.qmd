@@ -1,0 +1,418 @@
+---
+title: "Financial Data Fundamentals"
+subtitle: "Systematic Factors"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+  enabled: false # use to false when executing "skeletons" to avoid issues with incomplete code chunks
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Data Overview
+
+## Data Type
+
+Systematic factor datasets summarize the returns to broad sources of risk that are believed to explain differences in expected asset returns. Rather than representing the performance of a single security, each factor is itself a time series constructed from diversified portfolios.
+
+Common equity factors include
+
+- Market Excess Return (Mkt-RF)
+- Size (SMB)
+- Value (HML)
+- Profitability (RMW)
+- Investment (CMA)
+- Momentum (UMD / MOM)
+
+Factors are typically reported at
+
+- Daily
+- Weekly
+- Monthly
+- Annual
+
+frequencies.
+
+------------------------------------------------------------------------
+
+## Why It Matters
+
+Systematic factors are among the most widely used datasets in empirical finance.
+
+Applications include
+
+- Measuring portfolio performance
+- Estimating abnormal returns (alpha)
+- Risk attribution
+- Asset pricing research
+- Portfolio construction
+- Factor investing
+- Performance benchmarking
+- Academic replication studies
+
+Nearly every empirical asset pricing paper begins by downloading one or more factor datasets.
+
+------------------------------------------------------------------------
+
+## Data Structure
+
+Unlike OHLCV data, factor datasets are already transformed into returns.
+
+A typical monthly Fama-French dataset contains
+
+| Variable | Description                   |
+|----------|-------------------------------|
+| Date     | Observation month             |
+| Mkt-RF   | Market excess return          |
+| SMB      | Small minus Big               |
+| HML      | High minus Low book-to-market |
+| RF       | Risk-free rate                |
+
+Later datasets may additionally include
+
+| Variable | Description                              |
+|----------|------------------------------------------|
+| RMW      | Robust minus Weak profitability          |
+| CMA      | Conservative minus Aggressive investment |
+| MOM      | Momentum factor                          |
+
+Most datasets report returns in **percent**, not decimal form.
+
+Unlike stock prices, factor datasets generally
+
+- contain no missing trading days
+- require little cleaning
+- have consistent frequencies
+- are already adjusted for dividends and stock splits
+
+------------------------------------------------------------------------
+
+## Providers
+
+### Academic Data Libraries
+
+- **Kenneth French Data Library (Dartmouth)** — industry standard source for Fama-French factors and portfolio sorts
+- **AQR Data Library** — quality, value, momentum, carry, defensive factors
+- **Hou-Xue-Zhang q-Factor Library** — q-factor model datasets
+
+### Commercial Vendors
+
+- WRDS
+- Bloomberg
+- FactSet
+- LSEG / Refinitiv
+- MSCI Barra
+
+### Government Sources
+
+While governments do not publish factor returns directly, several underlying inputs originate from
+
+- CRSP
+- Compustat
+- U.S. Treasury
+- Federal Reserve
+
+------------------------------------------------------------------------
+
+## Access Methods
+
+Common acquisition methods include
+
+- Website downloads (CSV or ZIP)
+- REST APIs
+- R packages
+  - `tidyfinance`
+  - `tidyverse`
+  - `download.file()`
+  - `httr`
+- Python packages
+  - `pandas-datareader`
+  - `requests`
+  - `famafrench`
+
+Unlike FRED or Alpha Vantage, the Kenneth French Data Library does not currently provide a formal REST API. Instead, users download ZIP archives directly from the server.
+
+------------------------------------------------------------------------
+
+## Data Challenges
+
+Common issues include
+
+- Returns are reported in **percent** rather than decimal form.
+- Dates are encoded as integers (e.g. 202501).
+- Multiple datasets use different frequencies.
+- Files often contain documentation above and below the actual data.
+- Missing values often indicate the end of the dataset rather than missing observations.
+- Different datasets use different naming conventions (MOM vs UMD).
+- Some factors are excess returns while others are raw returns.
+
+Students should always inspect
+
+- units
+- frequency
+- date format
+- construction methodology
+- documentation
+
+before beginning analysis.
+
+------------------------------------------------------------------------
+
+## Factor Zoo
+
+The Fama-French three-factor model is only one member of a much larger family of systematic factors.
+
+Examples include
+
+| Family        | Representative Factors                     |
+|---------------|--------------------------------------------|
+| CAPM          | Market                                     |
+| Fama-French 3 | Market, SMB, HML                           |
+| Carhart 4     | FF3 + Momentum                             |
+| Fama-French 5 | FF3 + RMW + CMA                            |
+| Fama-French 6 | FF5 + Momentum                             |
+| q-Factors     | Market, Size, Investment, Profitability    |
+| AQR           | Value, Momentum, Quality, Carry, Defensive |
+
+Throughout the remainder of the course we will primarily use the Fama-French datasets because they are freely available, well documented, widely accepted in both academia and industry, and easily reproducible.
+
+## Example Analyses
+
+Common applications include
+
+- Estimate CAPM beta
+- Estimate FF3 alpha
+- Estimate FF5 exposures
+- Build factor mimicking portfolios
+- Compare active managers against factor benchmarks
+- Compute rolling factor loadings
+- Study historical factor premiums
+- Test new asset pricing models
+
+# Data Acquisition Exercises
+
+## Web
+
+Tasks
+
+- Visit Ken French's Data Library https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html
+- Download the FF3 monthly data
+- Unzip the file into the Data directory
+- Open in Excel. Scroll down the columns. Don't skip; scroll. What do you see as you get near the end of the daily data?
+- Load that csv file into R
+
+Task: Load the csv such that we only import the monthly data and we ignore the first 3 rows of descriptive text.
+
+```{r}
+Factors_Web <- read_csv(here::here("?","?"), skip = 4) %>%
+  rename(Date = 1) %>%
+  filter(grepl("^\\d{6}$", Date)) %>%
+  mutate(Date = as.integer(Date))
+
+```
+
+Task: Reload the data. Call it "raw". Don't filter that object.
+
+```{r}
+raw <- read_csv(
+  here::here("Data","F-F_Research_Data_Factors.csv"),
+  skip = 4,
+  show_col_types = FALSE
+) %>%
+  rename(Date = 1)
+```
+
+Task: Now filter on those that are NOT equal to the 6 digit Dates
+
+```{r}
+raw %>%
+  filter(!grepl("^\\d{6}$", Date)) %>%
+  dplyr::select(Date) %>%
+  head(10)
+```
+
+Q: What is the relevance?
+
+A: ?
+
+## API
+
+Let's now automate the whole process of downloading the zip and extracting the csv.
+
+Task: Set file name and path on the French library site
+
+```{r}
+French_ftp <- "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
+French_core_filename<-c("F-F_Research_Data_Factors")
+French_zip_filename<-paste0(French_core_filename,"_CSV.zip")
+French_url<- paste0(French_ftp,French_zip_filename)
+French_url
+```
+
+Task: Establish where you want to unzip the file and define the name you want to assign
+
+```{r}
+zipfile <- ?("Data", "FF_Factors.zip")
+```
+
+Task: Download the zip file
+
+```{r}
+download.file(?, zipfile, mode = "wb")
+```
+
+Task: Unzip the file
+
+```{r}
+ff_factors_raw_data <- ?(?, exdir = here("Data"))
+```
+
+Task: Establish name of csv you want to load
+
+```{r}
+French_csv_file<-paste0(?,".csv")
+```
+
+Task: Read the contents of the csv and pull the monthly observations only
+
+```{r}
+Factors_API <- read_csv(here::here("Data",?), skip = 4) %>%
+  rename(Date = 1) %>%
+  filter(grepl("^\\d{6}$", Date)) %>%
+  mutate(Date = as.integer(Date))
+```
+
+## Compare
+
+Task: Display the first 3 rows of the Web and API datasets
+
+```{r}
+head(Factors_Web,3)
+head(Factors_API,3)
+```
+
+# Reconstructing FF3
+
+- Pull the 6 portfolios formed on Size and Book to Market
+- Reconstruct the SMB
+- Reconstruct the HML
+- What is the market return? (Not the market minus risk free)
+
+## Download Portfolios
+
+Goal: Download the 6 portfolios formed by Size and BtM
+
+Task:
+
+```{r}
+French_core_filename<-c("6_Portfolios_2x3")
+French_zip_filename<-paste0(?,"_CSV.zip")
+French_url<- paste0(French_ftp,?)
+French_url
+
+```
+
+Task: Establish where you want to unzip the file and define the name you want to assign
+
+```{r}
+zipfile <- here("?", "FF_6Portfolios.zip")
+```
+
+Task: Download the zip file
+
+```{r}
+download.file(?, zipfile, mode = "wb")
+```
+
+Task: Unzip the file
+
+```{r}
+six_six_btm_portfolios <- ?(zipfile, exdir = here("Data"))
+```
+
+Task: Define the file name that you want to read
+
+```{r}
+French_csv_file<-paste0(French_core_filename,"?")
+French_csv_file
+```
+
+Task: Load the csv
+
+```{r}
+SixPort <- read_csv(here::here("Data",?), skip = 15) %>%
+  rename(Date = 1) 
+```
+
+Task: Keep only the first chunk of data since there are several variants in the csv.
+
+```{r}
+SixPort <- SixPort %>%
+  slice(
+    1:(which(is.na(Date))[1] - 1)
+  ) %>%
+  mutate(
+    Date = as.integer(Date),
+    across(-Date, as.numeric)
+  )
+
+SixPort<-na.omit(SixPort)
+```
+
+## Reconstruct Size and Value
+
+Task: Reconstruct SMB
+
+```{r}
+SMB_reconstructed <-
+?
+```
+
+Task: Reconstruct HML
+
+```{r}
+HML_reconstructed <-
+?
+```
+
+Task: Compare the portfolios from the French library to our reconstruction
+
+```{r}
+comparison <- tibble(
+
+    Date = Factors_API$Date,
+
+    SMB = Factors_API$SMB,
+
+    SMB_Reconstructed = SMB_reconstructed,
+
+    SMB_Error = Factors_API$SMB - SMB_reconstructed,
+
+    HML = Factors_API$HML,
+
+    HML_Reconstructed = HML_reconstructed,
+
+    HML_Error = Factors_API$HML - HML_reconstructed
+)
+
+summary(comparison$SMB_Error)
+
+summary(comparison$HML_Error)
+```
