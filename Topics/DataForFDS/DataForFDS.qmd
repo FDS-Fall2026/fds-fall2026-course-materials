@@ -1,0 +1,244 @@
+---
+title: "Data For Financial Data Science"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+engine: knitr
+execute:
+  warning: false
+  echo: true
+---
+
+# Data Types
+
+Paste here the elements from the various data files.
+
+## OHLCV
+
+### Data Type
+
+Daily market price data record the trading activity of financial securities over the course of each trading day. In this module, we focus on publicly traded equities.
+
+Each observation represents one security on one trading day, with regular session trading taking place between 9:30 AM ET and 4:00 PM ET. Typically includes the following variables:
+
+- Open
+- High
+- Low
+- Close
+- Volume
+- Adjusted
+
+### Why It Matters
+
+Market price data answer questions about how financial markets value assets over time.
+
+Common applications include:
+
+- Measuring investment performance
+- Computing simple and logarithmic returns
+- Estimating volatility and risk
+- Portfolio analysis
+- Technical analysis
+- Factor investing
+- Algorithmic trading
+- Forecasting future returns
+
+### Example products
+
+Examples of products built using market price data include:
+
+- Portfolio performance dashboards
+- Risk monitoring systems
+- Stock screening tools
+- Trading signal generators
+- Investment research reports
+
+### Unit of Observation
+
+Unit of observation: One security on one trading day
+
+Typical frequency
+
+- Daily
+- Weekly (aggregated)
+- Monthly (aggregated)
+
+### Primary identifiers
+
+- Ticker symbol
+- Trading date
+
+Column Definitions:
+
+- Open: Executed price of first trade
+  - Note: There are various microstructure issues such as the opening auction, which are beyond our purview.
+- High: Highest trade price executed during the regular session
+- Low: Lowest trade price executed during the regular session:
+- Close: Last trade executed at or just before the close.
+  - Not: There are various microstructure issues such as the closing auction, which are beyond our purview. - Adjusted Close: The closing trade price modified to account for corporate actions that change shareholder value.
+- Volume: the total number of shares that actually traded during the regular session
+
+### Structure
+
+- One Asset: Rows = dates \| Columns = OHLCVA
+- Multi Asset Panel: Rows = dates \| Columns = Ticker \| Cells = Attribute of interest (e.g. adjusted close)
+- Temporal ordering:
+  - Convention is oldest to youngest
+  - Caution: Some vendors provide youngest to oldest
+- Trading days:
+  - NYSE trading calendar: https://www.nyse.com/trade/hours-calendars
+  - Typically 250-252 trading days per year with \~20 trading days per month and 5 trading days per week
+
+### Providers
+
+Many organizations distribute historical and real-time OHLCV (Open, High, Low, Close, Volume) data. They differ in asset coverage, data quality, historical depth, latency, licensing, and cost.
+
+### Public Websites
+
+Useful for exploring securities, viewing charts, and downloading small datasets manually.
+
+| Provider | Asset Coverage | Notes |
+|:--------------------|:-------------------------------|:------------------|
+| [Yahoo Finance](https://finance.yahoo.com/) | Stocks, ETFs, mutual funds, indices | Most common free source; downloadable historical prices |
+| [Investing.com](https://www.investing.com/) | Global equities, ETFs, indices, commodities, FX | Broad international coverage |
+| [MarketWatch](https://www.marketwatch.com/) | Stocks, ETFs, indices | Limited historical downloads |
+| [TradingView](https://www.tradingview.com/) | Stocks, ETFs, futures, FX, crypto | Excellent charting; limited export capability |
+| [Barchart](https://www.barchart.com/) | Stocks, ETFs, futures, commodities | Strong futures coverage |
+| [ycharts](https://ycharts.com/) | Stocks, ETFs, futures |  |
+
+------------------------------------------------------------------------
+
+### Developer APIs
+
+Designed for automated retrieval within applications and analytical workflows.
+
+| Provider | Asset Coverage | Notes |
+|:--------------------|:-------------------------------|:------------------|
+| Yahoo Finance (unofficial) | Stocks, ETFs, mutual funds | Accessed through packages such as **quantmod**, **tidyquant**, or **yfinance** |
+| Alpha Vantage | Stocks, ETFs, FX, crypto | Free tier with API rate limits |
+| Polygon.io | Stocks, ETFs, options, crypto | Commercial service with institutional-quality data |
+| Tiingo | Stocks, ETFs | Clean daily data; free developer tier |
+| Twelve Data | Stocks, ETFs, FX, crypto | Free tier available |
+| Finnhub | Stocks, ETFs, FX, crypto | Free academic/personal tier |
+| IEX Cloud\* | U.S. equities | Historically popular; service offerings have changed over time |
+
+\* Availability and pricing should be verified before use.
+
+------------------------------------------------------------------------
+
+### Institutional Research Databases
+
+Typically accessed through university subscriptions.
+
+| Provider | Notes |
+|:-----------------------------------------|:-----------------------------|
+| **CRSP (via WRDS)** | Gold standard for academic research; survivorship-bias-free historical equity data |
+| **Refinitiv / LSEG Data Platform** | Institutional market data with extensive global coverage |
+| **FactSet** | Institutional-quality historical and real-time market data |
+| **Morningstar Direct** | Strong coverage of mutual funds and ETFs |
+
+------------------------------------------------------------------------
+
+### Professional Market Terminals
+
+Integrated platforms combining market data, analytics, news, and research.
+
+| Provider | Typical Users |
+|:---|:---|
+| Bloomberg Terminal | Investment professionals |
+| LSEG Workspace (formerly Refinitiv Eikon) | Financial institutions |
+| FactSet Workstation | Asset managers and research firms |
+
+------------------------------------------------------------------------
+
+### Access Methods
+
+Common acquisition methods include:
+
+- Excel Add-ins
+- Website downloads (CSV)
+- REST APIs
+- R packages
+  - `quantmod`
+  - `tidyquant`
+- Python packages
+  - `yfinance`
+- WRDS access (via web GUI or WRDS remote server)
+
+Throughout this course, we will primarily use Yahoo Finance together with R packages that automate data retrieval.
+
+### Example Analyses
+
+Examples of analyses using daily market price data include:
+
+- Compute simple and logarithmic returns
+- Compare cumulative investment performance
+- Measure historical volatility
+- Compute rolling correlations
+- Estimate CAPM beta
+- Build moving-average trading strategies
+- Construct efficient portfolios
+- Create momentum and reversal signals
+
+## Macro
+
+## Fundamentals
+
+## Factors
+
+# Engineering
+
+Here are a few best practices to remember while engineering for financial data science.
+
+## Missing
+
+### The Problem with Missing Data
+
+Q: Why is dropping missing values dangerous in finance?
+
+A:
+
+- Why missing? A holiday is different than a trading halt. Missingness might carry information.
+- Most finance data is time series. Dropping observations in a time series vector disrupts the temporal persistence.
+
+Best Practice: Always count the number of missing values and get their temporal location.
+
+### When are they Missing
+
+Q: Why do we care about when the missing values occured?
+
+A:
+
+- Missing values in the middle of the dataset are dangerous. We can't simply drop without thinking carefully.
+- Missing values near the beginning or end of the dataset aren't quite as dangerous. Dropping them won't disrupt the temporal persistence of the series.
+
+### How deal with Missing?
+
+1.  Drop (if they are on the tails of the dataset)
+2.  Interpolate (e.g. linear proxy between points)
+
+- Caution: Interpolating over many observations might create phantom persistence in the data
+
+3.  Foward fill
+
+- Use Case: Forward fill the last known price until the next trade takes place
+
+## Improper Observations
+
+### Price Violations
+
+- A common engineering check is to search for improper observations
+- Q: Suppose you are analying a set of market prices. What type of data might be a price violation?
+- A: Negative prices.
+
+Best Practice: Search for missing as well as negative prices
+
+## Ordering
+
+### Ensure Ordering
+
+- Ensure ordering of data by date or time to maintain temporal consistency
