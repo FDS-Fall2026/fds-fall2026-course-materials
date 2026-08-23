@@ -1,0 +1,664 @@
+---
+title: "Finance Theory for Financial Data Science"
+author: "Mike Aguilar (mike.aguilar@duke.edu)"
+format:
+  revealjs:
+    width: 1600
+    height: 700
+    margin: .06
+    incremental: true
+    slide-number: true
+    slide-level: 3
+    toc: true
+    toc-depth: 1
+    drawing: true
+    chalkboard: false
+    embed-resources: true #switch to true when distribute + switch chalkboard to false
+    auto-section-title: true
+    footer: "Mike Aguilar | mike.aguilar@duke.edu"
+    menu:
+      titleSelector: 'h1, h2'
+      useTextContentForMissingTitles: false
+      hideMissingTitles: true
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# Intro
+
+- In this deck, we will cover a few of the topics necessary to understand financial data science. This material is by no means exhaustive in its breadth or depth.
+- The expectation is that you have been exposed to most (all?) of this material. As such, this presentation is meant as a reminder as opposed to a first principles introduction.
+- We move from **measuring** returns and risk, to **modern portfolio theory**, to **asset pricing**, to **corporate fundamentals**, to **macro drivers** — roughly the order in which these concepts feed into the data science models later in the course.
+
+# Performance Measurement
+
+## Measuring Returns
+
+### Returns are a messy concept
+
+The term "Return" is colloquially abused.
+
+- Net vs Gross
+- Simple vs Log
+- Realized vs Unrealized
+- Price vs Total
+- etc...
+
+### Simple (Daily)
+
+Let's assume $t$ is one day
+
+- 1-Day Net Return (aka Holding Period Yield (HPY)): $R_{t}=\frac{P_{t}-P_{t-1}}{P_{t-1}}=\frac{P_{t}}{P_{t-1}}-1$
+- 1-Day Gross Return (aka Holding Period Return (HPR)) ?
+
+### Simple (Multiperiod)
+
+- 2-Day Net: $R_{t}(2)=\frac{P_{t}-P_{t-2}}{P_{t-2}}$
+- H-Day Net: $R_{t}(H)=\frac{P_{t}-P_{t-H}}{P_{t-H}}$
+- H-Day Gross: ?
+- H-Day Gross: ?
+
+### Simple Total Returns (Stocks)
+
+Define $P$ as price and $D$ as dividend and consider $R_{t} = \frac{P_{t}+D_{t}-P_{t-1}}{P_{t-1}}$.
+
+. . .
+
+Q: Can you write the Simple Total Return and decompose into two values?
+
+. . .
+
+A:
+
+?
+
+### Simple Total Returns (Bonds)
+
+Define $P$ as the price and $C$ as the coupon. Assume purchased at par, such that $P_{t-1}$ equals the face value.
+
+. . .
+
+Q: Can you write the Simple Total Return and decompose into two values?
+
+. . .
+
+A:
+
+?
+
+### Simple Annualized Returns
+
+Q: What is the meaning of "annualized" return?
+
+. . .
+
+A: ?
+
+### Simple Real Returns
+
+Q: What does "Real" mean? Why use?
+
+. . .
+
+A:?
+
+. . .
+
+Q: How compute real returns?
+
+?
+
+### Shortcoming of Simple Returns
+
+- Simple Returns are not additive
+  - returns on monday + tuesday + ... + friday does not equal the week's return
+- Simple Returns are not symmetric
+  - \$100 grown 20% is 120. But 120 shrunk by 20% is 96.
+- Our empirical models (e.g. regression) work better with additivity and symmetry
+- Log returns are a common solution
+  - Sum of daily log returns is weekly log return
+  - \$100 grown log return 20% and then shrunk 20% brings you back to \$100
+
+### From Simple to Log Returns
+
+Let's focus on daily returns
+
+- $r_{t}=ln(1+R_{t})=ln(P_{t}/P_{t-1}) = ln(P_{t})-ln(P_{t-1})$
+- $e^{r_{t}}-1=R_{t}$
+
+### MultiPeriod Log Returns
+
+- $r_{t}(2) = ln(1+R_{t}(2))=ln(P_{t}/P_{t-2})$
+- $r_{t}(2) = ln(\frac{P_{t}}{P_{t-1}}\frac{P_{t-1}}{P_{t-2}})$
+- $r_{t}(2) = ?$
+- $r_{t}(2) = ?$
+
+. . .
+
+More generally,
+
+?
+
+### Annualized Log Returns
+
+$r_{t}(H)^{A} = ?$
+
+### Real Log Returns
+
+- $r_{t}^{Real} = r_{t}-\pi_{t}^{C}$
+- where $\pi^{C}_{t} = ln(1+\pi_{t})$
+
+### Simple or Log?
+
+- Simple returns are used for performance reporting
+- Log returns are used for statistical modeling
+
+## Measuring Risk
+
+### Risk is Difficult to Measure
+
+Q: Why is risk so much more difficult to measure than returns?
+
+. . .
+
+A: ?
+
+. . .
+
+We will discuss the meaning of risk soon, but for now we proxy with variance and standard deviation.
+
+. . .
+
+- $\sigma^{2}_{r_{t}}=\frac{1}{T}\sum_{t=1}^{T}{(r_{t}-\bar{r})^{2}}$
+- $\sigma_{r_{t}} = \sqrt{\sigma^{2}_{r_{t}}}$
+- Both are commonly referred to as \`\`volatility"
+
+### Symmetric vs Asymmetric Risk Measures
+
+Q: Is treating upside and downside surprises the same always appropriate?
+
+. . .
+
+A: ?
+
+## Risk / Return Measures
+
+### Common Measures of the Risk/Return Tradeoff (SR)
+
+. . .
+
+Sharpe Ratio: ?
+
+. . .
+
+Q: Meaning? Want high or low?
+
+. . .
+
+A:
+
+- Return in excess of risk free per unit of risk ?
+
+### Common Measures of the Risk/Return Tradeoff (Tracking Error)
+
+. . .
+
+Tracking Error: $\sqrt{\frac{1}{T-1}\sum_{t=1}^{T}(R^{p}_{t}-R^{B}_{t})^{2}}$, where $R^{p}$ is the portfolio return and $R^{B}$ is the benchmark return.
+
+. . .
+
+Q: Meaning? Want high or low?
+
+. . .
+
+A:
+
+? 
+
+### Other Common Measures
+
+Information Ratio: $IR = \frac{R^{p}-R^{B}}{\text{Tracking Error}}$
+
+. . .
+
+? . . .
+
+Sortino Ratio: $\frac{R - R^{f}}{\sqrt{\frac{1}{T}\sum_{t=1}^{T}\left[\min\!\left(0,\; r_t - R^{f}\right)\right]^2}}$
+
+. . .
+
+?
+
+## Portfolio Risk and Return
+
+### Portfolio Return
+
+Q: What is the return of a portfolio composed of $N$ assets?
+
+. . .
+
+A: ?
+
+### Portfolio Risk
+
+Q: What is the variance of a portfolio composed of $N$ assets?
+
+A:
+
+?
+
+### Portfolio Variance (N=2)
+
+Q: What is the variance of a portfolio of 2 assets?
+
+A:
+
+?
+
+### Portfolio Variance (N=3)
+
+Q: What is the variance of a portfolio of 3 assets?
+
+A:
+
+?
+
+### Curse of Dimensionality
+
+We will compute portfolio return and variance from historical data for peformance reporting. Moreover, we will construct these objects on a prospective basis for portfolio allocation. Let's assume for now that the weights are known.
+
+Q: How many parameters do we need to estimate portfolio return of N assets?
+
+. . .
+
+A: ?
+
+. . .
+
+Q: How many parameters do we need to estimate the portfolio variance of N assets?
+
+. . .
+
+A: ?
+
+# Modern Portfolio Theory
+
+### What Is Risk?
+
+Q: What is risk, really?
+
+. . .
+
+A:
+
+?
+
+### Systematic vs Idiosyncratic Risk
+
+Q: Are all sources of risk equally important to a diversified investor?
+
+. . .
+
+A:
+
+?
+
+### Diversification
+
+Q: Why does combining assets reduce risk?
+
+. . .
+
+A:
+
+?
+
+### Expected Utility and Risk Aversion
+
+Q: How do we formalize investor preferences over risky outcomes?
+
+. . .
+
+A:
+
+?
+
+### Mean-Variance Preferences
+
+Q: When can we summarize preferences using just mean and variance?
+
+. . .
+
+A:
+
+?
+
+### The Efficient Frontier
+
+Q: With many risky assets available, which portfolios are "best"?
+
+. . .
+
+A:
+
+?
+
+### Adding a Risk-Free Asset
+
+Q: What changes once a risk-free asset is available?
+
+. . .
+
+A:
+
+? 
+
+### Portfolio Optimization in Practice
+
+Q: How do we solve for optimal weights?
+
+. . .
+
+A:
+
+? 
+
+# Asset Pricing
+
+## Pricing Risk Free Assets
+
+### Compounding
+
+Q: How much is \$100 grown at 5% per year for one year?
+
+. . .
+
+A:
+
+?
+
+### Discounting
+
+Q: How much is \$105 promised (with certainty) in one year from now worth today?
+
+A:
+
+? 
+
+### Coupon Bonds
+
+Q: What is the formula for the PV of a 2yr semi annual coupon bond?
+
+. . .
+
+A:
+
+?
+
+### Discount Bond
+
+Q: What is the formula for the PV of a N-yr discount bond?
+
+. . .
+
+A:
+
+?
+
+## Asset Market Equilibrium
+
+### Market Risk
+
+- Q: How use exposure to market fluctuations to determine if a stock is over/undervalued? (note: there are several approaches)
+- A: ?
+
+### Interpreting the CAPM
+
+Q: What do beta and lambda mean?
+
+. . .
+
+A:
+
+? 
+
+### The Security Market Line
+
+Q: How do we use CAPM to judge if a stock is over- or under-valued?
+
+. . .
+
+A:
+
+? 
+
+### Factor Risk
+
+Q: What if a single market factor doesn't fully explain returns?
+
+. . .
+
+A:
+
+? 
+
+## Fixed Income
+
+### Duration
+
+Q: How do we measure a bond's sensitivity to interest rate changes?
+
+. . .
+
+A: ? 
+
+### Duration Matching
+
+Q: Why do risk managers care about duration?
+
+. . .
+
+A:
+
+? 
+
+### Yield Curve
+
+Q: Why is the yield curve typically upward sloping?
+
+. . .
+
+A:
+
+? .
+
+### Yield Curve Shapes
+
+Q: What does the shape imply?
+
+. . .
+
+A:
+
+? 
+
+## Equity
+
+### Dividend Discount Model
+
+Q: What is a stock worth?
+
+. . .
+
+A: ? 
+
+### Gordon Growth Model
+
+Q: What if dividends are expected to grow at a constant rate forever?
+
+. . .
+
+A:
+
+? 
+
+### P/E Ratio
+
+Q: What is the P/E ratio? How is it measured? How is it used?
+
+. . .
+
+A:
+
+? 
+
+# Corporate Fundamentals
+
+### Income Statement
+
+Q: What does the income statement measure?
+
+. . .
+
+A: ? 
+
+### Balance Sheet
+
+Q: What does the balance sheet measure?
+
+. . .
+
+A: ? 
+
+### Cash Flow Statement
+
+Q: Why do we need a third statement beyond the income statement and balance sheet?
+
+. . .
+
+A: ? 
+
+### Key Ratios
+
+Q: How do we summarize firm health from these three statements?
+
+. . .
+
+A:
+
+**Profitability**
+
+- Gross Margin $=$ ?
+- Net Margin $=$ ?
+- ROE $=$ Net Income / Equity; ROA $=$ Net Income / Assets
+
+### Key Ratios (continued)
+
+**Liquidity**
+
+- Current Ratio $=$ Current Assets / Current Liabilities
+- Quick Ratio $=$ (Current Assets $-$ Inventory) / Current Liabilities
+
+. . .
+
+**Leverage**
+
+- Debt/Equity $=$ Total Debt / Equity
+- Interest Coverage $=$ EBIT / Interest Expense
+
+. . .
+
+**Efficiency**
+
+- Asset Turnover $=$ Revenue / Assets
+- Inventory Turnover $=$ COGS / Average Inventory
+
+# Macro Drivers
+
+### Macro KPI
+
+Q: What are the 4 major macro KPIs?
+
+. . .
+
+A:
+
+? 
+
+### Connecting the KPIs
+
+. . .
+
+![](MacroCycle1.jpg){width=65%}
+
+### Explaining the Connections
+
+Q: Can you theoretically connect the Macro KPIs?
+
+. . .
+
+![](MacroCycle2.jpg){width=65%}
+
+### Okun's Law
+
+Q: What does Okun's Law capture?
+
+. . .
+
+A:
+
+?
+
+### The Phillips Curve
+
+Q: What tradeoff does the Phillips Curve describe?
+
+. . .
+
+A:
+
+? 
+
+### The Taylor Rule
+
+Q: How do central banks set the policy rate, in theory?
+
+. . .
+
+A:
+
+? 
+
+### The IS Curve
+
+Q: What does the IS curve capture?
+
+. . .
+
+A:
+
+? 
+
+### Business Cycles
+
+Q: What are the phases of a business cycle, and how long does one typically last?
+
+. . .
+
+A:
+
+? 
+
+# From Theory to Financial Data Science
+
+### Why This Review Matters for the Course
+
+- Log returns $\rightarrow$ the natural scale for time-series models (stationarity, additivity)
+- Risk/covariance models $\rightarrow$ inputs to portfolio optimization, VaR, and ML-based risk models
+- Factor models $\rightarrow$ feature engineering for return prediction and risk attribution
+- Discounting & duration $\rightarrow$ scenario analysis and cash-flow forecasting under rate/macro shocks
+- Financial statements & ratios $\rightarrow$ structured features for credit-risk and corporate-forecasting models
+- Business cycle & macro drivers $\rightarrow$ the conditioning variables behind any scenario or stress-testing exercise
