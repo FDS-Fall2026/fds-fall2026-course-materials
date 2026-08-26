@@ -143,11 +143,11 @@ Another approach is to integrate GitHub directly into your IDE.
 
 ### Connect Git to R Studio
 
-- Tools -\> Git/SVN
+- Tools -\> Global Options -\> Git/SVN
 - Check the box "Enable version control interface for RStudio projects"
 - (Optional) check box of "Sign git commits"
 - Git executable: Find the executable for Git on your machine. Sometimes this is tricky. Here are two examples
-  - C:\Program Files\Git\cmd\git.exe
+  - C:/Program Files/Git/cmd/git.exe
   - C:/Users/mda3/AppData/Local/GitHubDesktop/app-3.6.2/resources/app/git/cmd/git.exe
 - Click Apply
 - To verify if Git was activated, go to File -\> New Project -\> Version Control. You should see Git as an option.
@@ -166,6 +166,7 @@ Another approach is to integrate GitHub directly into your IDE.
 - Click on organizations
 - You should see FDS-Fall2026
 - If you don't, please let the instructional staff known ASAP
+- Note: lack of access to the org shouldn't stop you from accessing the public repo.
 
 ## Connecting to Class Repo
 
@@ -236,7 +237,7 @@ Whenever you want the latest course materials
 - Clone the class repo as per the instructions above
 - Pull the latest edition
 - The instructor will make a minor edit to the README
-- Pull again and notice the changes your your local machine
+- Pull again and notice the changes on your local machine
 
 ## Student Private Repo
 
@@ -248,18 +249,22 @@ You will submit class materials via GitHub within your own private repo.
 - Under Owner, ensure that you select the FDS-Fall2026 organization and not your personal GitHub account
 - Use the following name convention. Mike Aguilar's repo for the 20206 FDS course would be MikeAguilar-FDS-Fall2026.\
 - Under visibility, select Private
-- Select "add README", but you don't need to add licensce or gitignore
+- Select "add README", but you don't need to add license or gitignore
   - Note: gitignore indicates which files/folders not to track
 - Click create repository
 
 ### Clone Private Repo
 
 - Clone Personal Repo as per the instructions above
-- Pull Personal Repo
+- Pull Personal Repo to your local machine
 - Create a folder called "ClassExercises", which you can use to store any class exercises.\
 - Create a folder called "CourseProject", which you can use to store code and deliverables associated with your course project.\
 - Commit the change
+  - R Studio: click the little "Git" icon in the top toolbar, then click Commit. Select the file, write a commit message, and click Commit.
+  - Positron: click the Source Control icon in the left toolbar (looks like 3 circles connected). You hover over the file name and click the plus button, or you can skip that and Positron will default to committing all files. Type a commit message in the "Messages" bar under "Changes". Then click Commit blue button.
 - Push the change
+  - R Studio: click the little 'Git icon in the top toolbar (this window might still be open from your commit step). The click Push. Note: You might get a notice to ensure you're logged into Git via web and MFA.
+  - Positron: click the Source Control icon in the left toolbar (looks like 3 circles connected). Click the 3 dots next to the repo name and then click push. Note: You can also commit and push in a single step by clicking the down arrow on the blue commit button.
 - Visit GitHub on the web to confirm the change
 
 ## Managing Conflicts
