@@ -151,12 +151,18 @@ Another approach is to integrate GitHub directly into your IDE.
   - C:/Users/mda3/AppData/Local/GitHubDesktop/app-3.6.2/resources/app/git/cmd/git.exe
 - Click Apply
 - To verify if Git was activated, go to File -\> New Project -\> Version Control. You should see Git as an option.
+- Setting your profile
+  - Often times, the initial installation of Git requires you to set your name and GitHub-registered email.
+  - You can follow [these](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) instructions
 
 ### Connect GitHub to Positron
 
 - File -\> Preferences -\> Settings
 - Search for Git: Enabled, which should be check on. Positron should detect Git automatically.
 - If Positron can't find Git, then search for Git: Path and edit the json
+- Setting your profile
+  - Often times, the initial installation of Git requires you to set your name and GitHub-registered email.
+  - You can follow [these](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) instructions
 
 ## Verifying Access to Class Organization
 
