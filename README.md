@@ -7,6 +7,8 @@ All grades will be stored and communicated via the official Canvas site for this
 Please contact with me with any questions or suggestions. 
 Mike Aguilar | mike.aguilar@duke.edu 
 
+TEST
+
 # Updating 
 
 - Please note that many of the links on this README won't be active until we've discussed that topic in class and I've pushed the accompanying materials to the repo. 
