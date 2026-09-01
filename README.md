@@ -7,7 +7,6 @@ All grades will be stored and communicated via the official Canvas site for this
 Please contact with me with any questions or suggestions. 
 Mike Aguilar | mike.aguilar@duke.edu 
 
-TEST
 
 # Updating 
 
