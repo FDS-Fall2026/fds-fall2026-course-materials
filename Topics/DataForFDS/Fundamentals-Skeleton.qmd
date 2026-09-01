@@ -1,0 +1,394 @@
+---
+title: "Financial Data Fundamentals"
+subtitle: "Company Fundamentals"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+  enabled: false # use to false when executing "skeletons" to avoid issues with incomplete code chunks
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Company Fundamentals
+
+## Data Type
+
+Company fundamentals are the line items reported in a firm's periodic financial statements (10-K annual filings, 10-Q quarterly filings, or non-US equivalents).
+
+Fundamentals span three statements
+
+- Income Statement (revenue, expenses, earnings)
+- Balance Sheet (assets, liabilities, equity)
+- Cash Flow Statement (operating, investing, financing flows)
+
+Typically reported at
+
+- Quarterly
+- Annual
+
+Compustat also flags whether a period is "as originally reported" or has since been restated.
+
+------------------------------------------------------------------------
+
+## Why it Matters
+
+- Items like revenues and costs are the foundation of discounting
+- Fundamentals are the primary input to valuation models (DCF, comparables, residual income)
+- They are combined into financial ratios used for screening and factor construction
+- Central to credit analysis, covenant monitoring, and default prediction
+- Drive academic research on earnings surprises, accruals, and accounting-based anomalies
+- Basis for forensic/fraud-detection analysis
+
+------------------------------------------------------------------------
+
+## Data Structure
+
+Unit of observation: one company in one fiscal period (quarter or year)
+
+Primary identifiers
+
+- GVKEY — Compustat's permanent company identifier
+- CUSIP / Ticker
+- Datadate — fiscal period end date
+- Fiscal Year (FYEARQ) / Fiscal Quarter (FQTR)
+
+Column Definitions (selected core items):
+
+| Variable | Compustat Mnemonic | Description |
+|:-----------------------|:-----------------------|:-----------------------|
+| Revenue | REVTQ | Total revenue for the period |
+| Cost of Goods Sold | COGSQ | Direct costs of producing goods/services sold |
+| SG&A | XSGAQ | Selling, general, and administrative expenses |
+| Operating Income | OIADPQ | Operating income after depreciation |
+| Net Income | NIQ | Bottom-line earnings attributable to common shareholders |
+| Total Assets | ATQ | Sum of all assets on the balance sheet |
+| Total Liabilities | LTQ | Sum of all liabilities |
+| Cash & Equivalents | CHEQ | Cash and short-term investments |
+| Long-Term Debt | DLTTQ | Long-term debt outstanding |
+| Shareholders' Equity | SEQQ | Book value of common equity |
+| CapEx | CAPXY | Capital expenditures, fiscal-year-to-date |
+
+Structure
+
+- One company: Rows = fiscal periods \| Columns = line items
+- Multi-company panel: Rows = firm-period \| Columns = line items
+- Temporal ordering: Convention is oldest to youngest
+
+Reporting considerations
+
+- Datadate reflects the fiscal period end, not the announcement/filing date
+- Fiscal year-ends differ across companies (not all firms use a calendar year)
+- Restatements: a later filing can revise an earlier period's figures — "as originally reported" and "as currently reported" can differ
+- Point-in-time caution: using currently-reported (restated) fundamentals to explain historical stock prices introduces look-ahead bias
+
+------------------------------------------------------------------------
+
+## Providers
+
+### Institutional Research Databases
+
+| Provider | Notes |
+|:-----------------------------------|:-----------------------------------|
+| **Compustat (via WRDS)** | Industry standard for academic fundamentals research; North America and Global |
+| Refinitiv / LSEG Worldscope | Global fundamentals coverage |
+| FactSet Fundamentals | Institutional-grade; widely used on the buy-side/sell-side |
+| Bloomberg (FA screen) | Fundamentals integrated with terminal analytics |
+
+### Public / Free Sources
+
+| Provider | Notes |
+|:-----------------------------------|:-----------------------------------|
+| SEC EDGAR | Original source filings (10-K/10-Q); free but unstructured |
+| Company Investor Relations sites | Original source; no cross-company standardization |
+| stockanalysis.com, macrotrends | Free, limited history and customization |
+
+Throughout this course, WRDS/Compustat is our primary source because it is standardized, survivorship-bias-free, and point-in-time flagged.
+
+------------------------------------------------------------------------
+
+## Access Methods
+
+- API
+- Web GUI
+- Batch jobs (on WRDS server)
+
+------------------------------------------------------------------------
+
+## Example Analyses
+
+- Compute growth rates (YoY, QoQ) in revenue and earnings
+- Screen for value, quality, or growth characteristics from raw fundamentals
+- Construct the Piotroski F-Score or Altman Z-Score
+- Estimate implied cost of capital / DCF valuations
+- Study earnings-announcement drift and accounting-based anomalies
+- Build credit risk / covenant monitoring models
+- Benchmark a company against its peer group
+
+## Exercise
+
+- Log into WRDS
+- Navigate to Get Data -\> All Data -\> Compustat - Capital IQ -\> Compustat -\> North America
+- Navigate to Fundamentals Quarterly
+- Scroll to Step1: Step dates 2020-1 through 2025-12
+- Scroll to Step2:
+  - Why we think of identifying a company, we usually think of the ticker.\
+  - Q: Why are there multiple ways to identify a company? e.g. CUSIP, GvKey, etc..
+  - A: ?
+  - In the search bar "Selection an option for entering your company codes" type IBM.
+- Scroll to Step 3:
+  - Select Company Name, Ticker, Cusip
+  - Select Cash \[you can click on the question mark to understand the definition\]
+- Scroll to Step 4:
+  - Output Format: csv \[Best for reading into R / Python\]
+  - Compression Type: Uncompressed \[If large, usually best to zip\]
+  - Date Format: YYYY-MM-DD \[Usually best for reading into R/ Python for time series analysis\]
+  - Submit Form
+  - Click the Query Number
+- Download CSV
+- Dates
+  - Open in Excel. Notice the datadate format is not YYYY-MM-DD
+  - Now open in R. Notice the datadate is the desired format.
+  - Excel often changes the date display.
+
+# Expectations
+
+## Data Type
+
+Analyst expectations data capture Wall Street's forward-looking forecasts of a company's future performance — most commonly EPS, but also revenue and other line items — along with buy/sell/hold recommendations.
+
+Reported at two levels
+
+- Detail: each individual analyst's forecast
+- Summary: consensus statistics aggregated across analysts (mean, median, standard deviation, number of estimates)
+
+Forecast horizons include quarterly (Q1–Q4), annual (FY1, FY2), and long-term growth (LTG)
+
+------------------------------------------------------------------------
+
+## Why it Matters
+
+- Asset pricing is prospective
+- Consensus estimates are the benchmark against which "earnings surprises" are measured
+- Revisions in analyst forecasts are a widely studied predictor of returns
+- Support implied cost-of-capital and forward-looking valuation models
+- Analyst dispersion is a common proxy for uncertainty/disagreement among market participants
+
+------------------------------------------------------------------------
+
+## Data Structure
+
+Unit of observation: one analyst's forecast for one company, for one forecast period, as of one statistical period (detail); or one company/forecast-period/statistical-period consensus (summary)
+
+Primary identifiers
+
+- Ticker / CUSIP
+- Forecast Period End Date (FPEDATS) — the future date the forecast pertains to
+- Statistical Period Date (STATPERS) — the date the consensus snapshot was taken
+- Forecast Period Indicator (FPI) — Q1–Q4, FY1, FY2, LTG
+
+Column Definitions (Summary Statistics file):
+
+| Variable    | Description                                     |
+|:------------|:------------------------------------------------|
+| MEDEST      | Median forecast across contributing analysts    |
+| MEANEST     | Mean forecast across contributing analysts      |
+| STDEV       | Standard deviation across analyst forecasts     |
+| NUMEST      | Number of analysts contributing to the estimate |
+| ACTUAL      | Realized/reported value, once known             |
+| ANNDATS_ACT | Date the actual value was announced             |
+
+Structure
+
+- Long panel: Rows = company × forecast period × statistical period \| Columns = estimate statistics
+- STATPERS advances on a regular cadence (typically weekly) while FPEDATS is fixed, so a single forecast period accumulates many consensus snapshots as the period approaches
+- Missing ACTUAL / ANNDATS_ACT values indicate the forecast period hasn't occurred yet (see the Exercise)
+
+------------------------------------------------------------------------
+
+## Providers
+
+- IBES is the primary aggregator of Wall Street "consensus"
+
+| Provider | Notes |
+|:-----------------------------------|:-----------------------------------|
+| **LSEG I/B/E/S (via WRDS)** | Industry-standard academic source for consensus estimates |
+| Zacks Investment Research | Commercial consensus estimates and rankings |
+| FactSet Estimates | Institutional-grade; integrated with FactSet workstation |
+| Visible Alpha | Granular, line-item-level consensus modeling |
+| Bloomberg (EEO) | Estimates integrated within the Bloomberg terminal |
+
+------------------------------------------------------------------------
+
+## Access Methods
+
+- WRDS Web GUI (Summary History / Detail History)
+- WRDS batch/cloud queries
+- Vendor terminals and APIs (FactSet, Bloomberg, Refinitiv Workspace)
+- Unlike price or factor data, open R/Python packages for consensus estimates are limited; most access runs through subscription platforms
+
+------------------------------------------------------------------------
+
+## Example Analyses
+
+- Compute earnings surprises (actual − consensus)
+- Study post-earnings-announcement drift conditioned on surprise magnitude
+- Measure analyst forecast dispersion as an uncertainty proxy
+- Track consensus revisions over time
+- Build implied cost-of-capital estimates
+- Compare forecast accuracy across analysts or brokerage houses
+
+## Exercise
+
+- Log into WRDS
+- Navigate to Get Data -\> All Data -\> LSEG IBES -\> Summary History -\> Summary Statistics
+- Scroll to Step1
+  - Change Date Variable to Forecast Period End Date
+  - Change dates to 2022-01 to 2025-12
+- Scroll to Step2
+  - Enter IBM as official ticker
+  - Keep EPS
+  - Switch Forecast Period Indicator (FPI) to Q1, Q2, Q3, Q4
+- Scroll to Step 3
+  - Click All
+- Scroll to Step 4
+  - Keep defaults
+  - Click Submit
+  - Download the file when ready
+  - Click on Query
+- Open in Excel
+  - Tip: In Excel, Sort by FPEDATS Oldest to Youngest and then add a sorting layer on STATPERS Oldest to Youngest.
+  - Q: Can you interpret the first row?
+  - A: ?
+  - Q: Go to the last row. Why are the last couple of columns missing?
+  - A: ?
+
+# Ratios
+
+## Data Type
+
+Financial ratios standardize relationships between financial statement items — and, in some cases, market prices — into metrics used to assess valuation, profitability, liquidity, leverage, and efficiency.
+
+WRDS distributes ratios at two levels
+
+- Firm-level: one ratio value per company per period
+- Industry-level: ratios aggregated (mean/median) across all firms in a GICS classification
+
+Common ratio categories
+
+- Valuation (?)
+- Profitability (?)
+- Liquidity (current ratio, quick ratio)
+- Leverage / Solvency (debt/equity, interest coverage)
+- Efficiency (asset turnover, inventory turnover)
+
+Typically reported at
+
+- Monthly (firm-level ratios that combine market price with quarterly financials)
+- Quarterly / Annual (fundamentals-only ratios)
+
+------------------------------------------------------------------------
+
+## Why it Matters
+
+?
+
+------------------------------------------------------------------------
+
+## Data Structure
+
+Unit of observation
+
+- Firm-level: one company in one period
+- Industry-level: one GICS classification (Sector / Industry Group / Industry) in one period, aggregated across constituent firms
+
+Primary identifiers
+
+- Firm-level: GVKEY / PERMNO / Ticker, Date
+- Industry-level: GICS code, Date
+
+Column Definitions (selected):
+
+| Variable      | Description                          |
+|:--------------|:-------------------------------------|
+| P/E           | Price-to-earnings ratio              |
+| P/B           | Price-to-book ratio                  |
+| EV/EBITDA     | Enterprise value to EBITDA           |
+| ROE           | Return on equity                     |
+| ROA           | Return on assets                     |
+| Current Ratio | Current assets / current liabilities |
+| Debt/Equity   | Total debt / shareholders' equity    |
+
+Structure
+
+- Long panel: Rows = firm (or industry) × date \| Columns = ratio
+- Industry-level files report whichever aggregation statistic is chosen at query time — mean or median (see the Exercise)
+- Because many ratios combine market price with lagged accounting data, the same point-in-time and look-ahead considerations from Company Fundamentals apply here
+
+------------------------------------------------------------------------
+
+## Providers
+
+| Provider | Notes |
+|:-----------------------------------|:-----------------------------------|
+| **Financial Ratios Suite (via WRDS)** | Firm-level and industry-level; built by WRDS from Compustat, CRSP, and IBES |
+| Bloomberg | Ratio screens integrated into the terminal (FA, EQS) |
+| FactSet | Ratio and screening tools within the workstation |
+| Morningstar Direct | Strong fund and equity ratio coverage |
+| Public screeners (stockanalysis.com, macrotrends) | Free, limited history and customization |
+
+------------------------------------------------------------------------
+
+## Access Methods
+
+- WRDS Web GUI (Financial Ratios Suite)
+- WRDS batch/cloud queries
+- Can also be computed manually by combining Compustat fundamentals with CRSP prices and IBES estimates
+
+------------------------------------------------------------------------
+
+## Example Analyses
+
+- Relative valuation screens (compare a firm's ratios to industry benchmarks)
+- Construct value/quality factor portfolios from ratio data
+- Track industry-level valuation cycles over time
+- Credit scoring and covenant monitoring
+- Peer/comparable-company benchmarking
+
+## Exercise
+
+- Log into WRDS
+- Navigate to Get Data -\> All Data -\> Financial Ratios Suite by WRDS
+- Navigate to Financial Ratios -\> Financial Ratios Industry Level by WRDS
+  - Note: The second set of options "with IBES subscription" has interesting forward looking ratios
+- Scroll to Step 1
+  - Change dates from 2020-01-01 through 2025-12-31
+- Scroll to Step 2
+  - Keep GICS 10 Sectors
+  - Check all of the Valuation Ratios
+- Scroll to Step 3
+  - Keep Median
+- Scroll to Step 4
+  - Keep defaults
+  - Click Submit
+  - Click on the Query number
+  - Download the file when ready
+  - Open in
+- Q: Long or Wide dataframe?
+- A: ?
