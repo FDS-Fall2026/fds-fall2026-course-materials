@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 .posit/assistant
+
+/.quarto/
+**/*.quarto_ipynb
