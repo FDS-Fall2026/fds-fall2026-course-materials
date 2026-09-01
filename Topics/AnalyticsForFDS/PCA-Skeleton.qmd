@@ -1,0 +1,710 @@
+---
+title: "PCA for Financial Data Science"
+subtitle: "PCA: Principal Component Analysis"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+  enabled: false
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Background
+
+- You are a data scientist at a large commercial bank.
+- The bank lends throughout the United States.
+- Risk managers monitor dozens of economic indicators for every metropolitan area.
+- Lending officers want a small number of measures summarizing regional economic conditions.
+- Can we reduce many correlated indicators into only a few informative dimensions?
+- We will focus on PCA as our dimension reduction technique.
+- The data includes economic indicators for metropolitan statistical areas (MSAs) across the United States.
+
+# Data
+
+## Acquisition
+
+Task: Load the data dictionary from the Data_Dictionary sheet of msa_economic_indicators.xlsx.
+```{r} 
+data_dictionary <- read_excel(
+  here("Data", "msa_economic_indicators.xlsx"),
+  sheet = "Data_Dictionary"
+)
+```
+
+Q: Before doing any quantitative analysis, which variables do you suspect to be related to each other? 
+
+A: ?
+
+Task: Load data file msa_economic_indicators.xlsx from the Data sheet. 
+
+```{r}
+msa_data <- read_excel(
+  here("Data", "?"),
+  sheet = "?"
+)
+```
+
+## Cleaning
+
+Task: Check for missing values
+
+```{r}
+?
+```
+
+## Engineering
+
+Task: Standardize the data using "scale"
+
+```{r}
+msa_data_standardized <- ?(msa_data %>% select(-?)) %>%
+    as.data.frame() %>%
+    mutate(msa_id = msa_data$msa_id) %>%
+    select(msa_id, everything())
+```
+
+Task: Convert msa_data to a long dataframe. Then compute the mean and standard deviation of each variable.
+
+```{r}
+msa_data%>%
+    ?(-msa_id, names_to = "variable", values_to = "value") %>%
+    group_by(?) %>%
+    summarise(mean = mean(value), sd = sd(value))
+```
+
+Task: Convert msa_data_standardized to a long dataframe. Then compute the mean and standard deviation of each variable.
+
+```{r}
+msa_data_standardized%>%
+    pivot_longer(-msa_id, names_to = "variable", values_to = "value") %>%
+    group_by(variable) %>%
+    ?(mean = ?, sd = ?)
+
+```
+
+Q: What do these summaries suggest?
+
+A: ?
+
+## EDA
+
+Let's focus on the comovement for this exercise.
+
+### Compute correlation matrix
+
+Task: Compute the correlation matrix among the indicators
+
+```{r}
+correlation_matrix <- ?(msa_data_standardized %>% select(-?))
+correlation_matrix
+```
+
+Q: Which indicators are candidates for consolidation?
+
+A:
+?
+
+### Visualize the correlation matrix
+
+Task: Create a heatmap of the correlation matrix.
+
+```{r}
+melted_corr <- melt(correlation_matrix)
+
+ggplot(melted_corr, aes(Var1, Var2, fill = value)) +
+ geom_tile() +
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, 
+                      limit = c(-1, 1), name = "Correlation") +
+ scale_y_discrete(limits = rev(levels(melted_corr$Var2))) +
+ labs(title = "Correlation Matrix Heatmap", x = NULL, y = NULL) +
+ theme_minimal() +
+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Visualize pairwise plots
+
+Task: Generate pairwise plots for all indicators
+
+```{r}
+ggpairs(? %>% select(-msa_id))
+```
+
+Q: What does the pairs plot suggest?
+
+A:
+
+?
+
+# Implementing PCA 
+
+Q: What is our analytical goal for this case study? How might PCA help? 
+
+A: 
+
+?
+
+Task: Run PCA on the raw indicators using prcomp
+
+```{r}
+pca_raw <- ?(msa_data %>% ?(-msa_id), scale. = FALSE)
+```
+
+Task: Run the summary command on the PCA object.
+
+```{r}
+?(pca_raw)
+```
+
+Q: Can you interpret the output?
+
+A:
+
+?
+
+Q: Why are 11 PCs listed?
+
+A:? 
+
+
+# Why is standardizing important?
+
+Task: Run pca on the standardized data
+
+```{r}
+pca_z <- ?(? %>% select(-msa_id), scale. = FALSE)
+```
+
+Task: Summarize that pca with the summary command
+
+```{r}
+?
+```
+
+Task: Re-estimate on msa_data (not standardized data), but set scale. = TRUE
+```{r}
+pca_z2 <- ?(?%>% select(-msa_id), scale. = ?)
+summary(pca_z2)
+```
+
+Q: Coding implication? 
+
+A: ?
+
+
+Task: Compare the PC1 loadings for the MSA indicators using raw vs. standardized data, the same way we did for the toy example.
+
+```{r}
+msa_loadings <- bind_rows(
+  tibble(variable = names(pca_raw$rotation[, 1]), loading = pca_raw$rotation[, 1], version = "Raw"),
+  tibble(variable = names(pca_z$rotation[, 1]), loading = pca_z$rotation[, 1], version = "Standardized")
+)
+
+ggplot(msa_loadings, aes(variable, ?)) +
+  geom_col() +
+  facet_wrap(~version) +
+  labs(
+    title = "MSA indicators: PC1 loadings, raw vs. standardized",
+    x = NULL, y = "PC1 loading"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Q: Which indicators dominate the raw PC1? Do they still dominate once standardized?
+
+A:
+?
+
+
+## Choosing the number of components
+
+Q: Our goal is to reduce the dimension of the data.  Based on the summary information above, how many principal components do you think we should use? 
+
+A: 
+
+? 
+
+Task: Construct Scree Plot plotting "plot" pca_z. 
+
+```{r}
+?(pca_z, type = "line")
+```
+
+Q: Interpret?
+
+A:
+
+?
+
+Note that the PCA method transforms the covariance matrix of the data by rescaling into principal component vectors, which explain the maximum variation in the data.  We solve $\Sigma v_{i}=\lambda_{i}v_{i}$ for each PC $(i)$, where $\lambda_{i}$ is the $i^{th}$ eigenvalue and $v_{i}$ is the $i^{th}$ eigenvector aka principal component.  
+
+
+
+Task: Impose the Kaiser Criterion; i.e. keep all PCs with eigenvalues \> 1.
+
+```{r}
+eigenvalues <- pca_z$sdev^2
+kaiser <- data.frame(
+  Component = paste0("PC", seq_along(eigenvalues)),
+  Eigenvalue = eigenvalues,
+  Retain = ?
+)
+
+kaiser
+```
+
+Q: How many PCs are suggested?
+
+A: ?
+
+Q: How many PCs are needed if want to explain 60% of variance? 75%? 90%?
+
+A:
+?
+
+# Interpreting PCA
+
+## Loadings
+
+Task: Plot the loadings for PC1, PC2, PC3.
+
+```{r}
+pc1_order <- names(sort(abs(pca_z$rotation[, 1]), decreasing = TRUE))
+
+pc_loadings <- as_tibble(pca_z$rotation[, ?], rownames = "variable") %>%
+  pivot_longer(-variable, names_to = "PC", values_to = "loading") %>%
+  mutate(
+    PC = factor(PC, levels = c("PC1", "PC2", "PC3")),
+    # Order indicators by |PC1 loading| so all facets share the same x-axis order
+    variable = factor(variable, levels = pc1_order)
+  )
+
+ggplot(pc_loadings, aes(variable, loading)) +
+  geom_col() +
+  facet_wrap(~PC, ncol = 1) +
+  labs(title = "PCA loadings for PC1, PC2, PC3", x = NULL, y = "Loading") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+Q: Interpret the loading vector values.
+
+A:
+
+?
+
+
+## Scores
+
+Q: What is a PCA score? Contrast with a loading. 
+
+A: 
+
+?
+
+Task: Extract the PC1 score for the first MSA from the pca_z object
+```{r}
+?
+```
+
+Task: Recreate that PC1 score as a weighted sum of the loadings. 
+```{r}
+msa001 <- msa_data_standardized %>%
+  filter(msa_id == "MSA001") %>%
+  select(-msa_id) %>%
+  unlist()
+
+pc1_loadings <- pca_z$rotation[, 1]
+
+?
+```
+
+
+Q: How do we interpret the score in our context?
+
+A:
+
+?
+
+Task: Extract the PC1 score for the second, third, and fourth MSAs
+```{r}
+pca_z$x[2:4, 1]
+```
+
+Q: What's the interpretation of the sign and magnitude of these PC1 scores relative to MSA001? 
+
+A: 
+?
+
+## Reconstruction
+The goal of dimension reduction is to represent the original data using fewer dimensions while retaining as much information as possible.
+
+This creates a tradeoff. If we retain all principal components, we lose no information, but we achieve no dimension reduction. If we retain only a few principal components, we obtain a simpler representation but lose some information about the original data.
+
+We can quantify this tradeoff by asking: How accurately can the retained PCs reconstruct the original data?
+
+Q: How reconstruct the data from the PCA? 
+
+A: 
+
+?
+
+
+Task: Create a function that reconstructs the data via scores times loadings. 
+```{r}
+original <- msa_data_standardized %>% select(-msa_id) %>% as.matrix()
+
+reconstruct <- function(pca, k) {
+  scores <- pca$x[, 1:k, drop = FALSE]
+  loadings <- pca$rotation[, 1:k, drop = FALSE]
+  recon <- scores %*% t(loadings)
+  sweep(recon, 2, pca$center, "+")
+}
+```
+
+Task: Reconstruct the data using only the first principal component.
+```{r}
+reconstruction_1pc <- ?(pca_z, ?)
+head(reconstruction_1pc)
+```
+
+Task: Compute the mean squared reconstruction error
+
+```{r}
+error_1pc <- ?
+error_1pc
+```
+
+Task: Reconstruct the data using only the first and second principal components.
+
+```{r}
+reconstruction_2pc <- reconstruct(pca_z, ?)
+head(reconstruction_2pc)
+```
+
+Task: Compute the mean squared reconstruction error
+
+```{r}
+error_2pc <- ?
+error_2pc
+```
+
+Task: Reconstruct the data using only the first, second, and third principal components.
+
+```{r}
+reconstruction_3pc <- reconstruct(pca_z, ?)
+head(reconstruction_3pc)
+```
+
+Task: Compute the mean squared reconstruction error
+
+```{r}
+error_3pc <- ?
+error_3pc
+```
+
+```{r}
+tibble(
+  `# PCs used` = 1:3,
+  `Reconstruction error (MSE)` = c(error_1pc, error_2pc, error_3pc)
+)
+```
+
+Q: Why not always use all PCs?
+
+A:
+
+?
+## BiPlot
+
+Q: How read a biplot for PCA analysis? 
+
+A: 
+?
+
+Task: Compute the Biplot between PC1 and PC2
+
+```{r}
+?(pca_z, choices = c(?, ?), cex = c(0.6, 0.8))
+```
+
+Q: Interpret.
+
+A:
+
+?
+
+
+Task: Compute the Biplot between PC1 and PC3
+
+```{r}
+biplot(pca_z, choices = c(?, ?), cex = c(0.6, 0.8))
+```
+
+Q: Interpret.
+
+A:
+
+?
+
+Task: Compute the Biplot between PC2 and PC3
+
+```{r}
+?(pca_z, choices = c(?, ?), cex = c(0.6, 0.8))
+```
+
+Q: Interpret.
+
+A:
+
+?
+
+## Business interpretation
+
+Q: What is the economic interpretation of each PC?
+
+A:
+?
+
+Q: Which direction of PC1 corresponds to stronger housing markets?
+
+A:
+
+?
+
+Task: Rank the metro areas by housing market strength.
+
+```{r}
+housing_strength <- tibble(
+  msa_id = msa_data_standardized$msa_id,
+  PC1 = pca_z$x[, 1],
+  housing_strength_score = -pca_z$x[, 1]
+) %>%
+  arrange(?(housing_strength_score)) %>%
+  mutate(rank = row_number())
+
+housing_strength
+```
+
+Q: Which MSAs have strongest housing markets?
+
+A:
+?
+
+Task: Create a table that compares MSA042 to the average MSA along all of the housing dimensions. 
+
+```{r}
+housing_validation_raw <- msa_data %>%
+  select(msa_id, c(Building_Permits,Home_Price_Appreciation,Housing_Vacancy_Rate,Rent_Growth_Rate)) %>%
+  pivot_longer(
+    cols = -msa_id,
+    names_to = "Variable",
+    values_to = "Value"
+  ) %>%
+  group_by(Variable) %>%
+  summarise(
+    Average_MSA = ?(Value, na.rm = TRUE),
+    MSA042 = Value[msa_id == "?"]
+  )
+
+housing_validation_raw
+```
+
+Q: Does the underlying data support our interpretation of MSA042's PC1 score?
+
+A: 
+
+?
+
+
+Q: Which direction of PC3 corresponds to weaker labor markets?
+
+A:
+
+?
+
+Task: Rank the metros by weakest labor markets.
+
+```{r}
+labor_market <- tibble(
+  msa_id = msa_data_standardized$msa_id,
+  PC3 = ?
+) %>%
+  arrange(desc(PC3)) %>%
+  mutate(rank = row_number())
+head(labor_market, 10)
+```
+
+Q: Which MSAs have the weakest labor markets according to PC3?
+
+A:
+
+?
+
+# Robustness Checks
+
+## Sensitivity to outliers
+
+Task: Remove MSA022 and MSA042. Rerun PCA.
+
+```{r}
+msa_data_trimmed <- msa_data_standardized %>%
+  filter(!msa_id %in% c(?))
+
+pca_trimmed <- ?(msa_data_trimmed %>% select(-msa_id), scale. = FALSE)
+```
+
+Task: Compare the summary of the first 3 PCs for the new trimmed set and the original standardized data.
+
+```{r}
+summary(pca_z)$importance[, ?]
+summary(pca_trimmed)$importance[, ?]
+```
+
+Q: Does removing these two outlier MSAs change the PCA results substantially?
+
+A:
+
+?
+
+
+## Correlated Variable
+Let's examine the impact upon PCA of highly correlated variables. 
+
+
+Task: Duplicate the first indicator.
+
+```{r}
+msa_data_extended <- msa_data_standardized %>%
+  mutate(GDP_dup = GDP)
+```
+
+Task: Rerun PCA on an extended set that includes this duplicated indicator.
+
+```{r}
+pca_extended <- ?(? %>% select(-msa_id), scale. = FALSE)
+```
+
+Task: Summarize the PCA results for the original and extended dataset across the first 3 PCs
+
+```{r}
+?(pca_z)$importance[, 1:3]
+?(pca_extended)$importance[, 1:3]
+```
+
+Task: Display the loadings for the original and extended dataset of the first 3 PCs.
+
+```{r}
+round(pca_z$?[, 1:3], 3)
+round(pca_extended$?[, 1:3], 3)
+```
+
+Task: Display the scores for the original and extended dataset for the first two PCs.
+
+```{r}
+tibble(
+  msa_id = msa_data_standardized$msa_id,
+  PC1_original = pca_z$x[, 1],
+  PC1_extended = pca_extended$x[, 1],
+  PC2_original = pca_z$x[, 2],
+  PC2_extended = pca_extended$x[, 2]
+) %>%
+  head(10)
+```
+
+Q: What's the impact on the variance explained, loading vectors, and scores?
+
+A:
+?
+
+
+## Noise 
+Let's examine how measurement noise in one variable affects PCA. We will add progressively more independent noise to Unemployment_Rate and examine how its role in the principal components changes.
+
+Task: Add increasing noise to Unemployment_Rate, re-standardize the data, and recor its correlation with wage growth and record its loading on PC3. Because PCA signs can flip across repeated runs, align the sign of PC3 with the original PCA before recording the loading.
+```{r}
+loadings_orig <- pca_z$rotation[, 1:3]
+
+align_sign <- function(reference, candidate) {
+  if (sum(reference * candidate) < 0) {
+    candidate <- -candidate
+  }
+  candidate
+}
+
+noise_effect <- function(sigma2) {
+
+  noisy_data <- msa_data_standardized %>%
+    mutate(
+      Unemployment_Rate =
+        Unemployment_Rate +
+        rnorm(n(), mean = 0, sd = sqrt(sigma2))
+    )
+
+  # Re-standardize after adding noise
+  x <- noisy_data %>%
+    select(-msa_id) %>%
+    scale()
+
+  pca_noisy <- prcomp(x, center = FALSE, scale. = FALSE)
+
+  # Align PC3 sign with the original PCA
+  pc3_loading <- align_sign(
+    loadings_orig[, 3],
+    pca_noisy$rotation[, 3]
+  )["Unemployment_Rate"]
+
+  tibble(
+    correlation = cor(
+      x[, "Unemployment_Rate"],
+      x[, "Wage_Growth_Rate"]
+    ),
+    PC3_loading = pc3_loading
+  )
+}
+```
+
+Task: Repeat across increasing noise levels. 
+
+```{r}
+sigma2_grid <- seq(0, 1, by = 0.1)
+n_reps <- 100
+
+set.seed(7194)
+
+noise_results <- map_dfr(sigma2_grid, function(s2) {
+
+  map_dfr(1:n_reps, function(i) {
+    noise_effect(s2)
+  }) %>%
+    summarize(
+      correlation = mean(correlation),
+      PC3_loading = mean(PC3_loading)
+    ) %>%
+    mutate(sigma2 = s2)
+})
+noise_results
+```
+
+Q: What happens as we add more noise?
+
+A:
+?
