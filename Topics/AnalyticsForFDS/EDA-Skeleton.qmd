@@ -1,0 +1,706 @@
+---
+title: "EDA for Financial Data Science"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+  enabled: false
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+Goal: Summarize the behavior of the simple daily net returns for IBM, FORD, CAT, AAPL, and DIS from the beginning of 2020 through the end of 2025
+
+# Data
+
+## Data Acquisition
+
+Task: Create a parameter list of the tickers and dates
+
+```{r}
+params = list(
+  tickers = c("IBM", "F", "CAT", "AAPL", "DIS"), 
+  startdate = "2019-12-20", 
+  enddate = "2025-12-31"
+)
+```
+
+Q: If we want 2020 through 2025, why are we grabbing data from 2019.
+
+A: ? 
+
+Task: Load the tickers with the getSymbols function
+
+```{r}
+getSymbols(
+  ?,
+  src = "yahoo",
+  from = ?,
+  to = ?,
+  index.class = "POSIXct"
+)
+```
+
+Task: Create a wide data object containing the adjusted closing prices for all of the assets.
+
+```{r}
+AdjPrices_Wide <- do.call(
+  merge,
+  lapply(params$tickers, function(x) Ad(get(x)))
+)
+```
+
+Task: Add the date to that wide object
+
+```{r}
+AdjPrices_Wide <- AdjPrices_Wide %>%
+  as_tibble(rownames = "date") %>%
+  mutate(date = as.Date(?))
+```
+
+Task: Transpose the wide object to long format
+
+```{r}
+AdjPrices_Long <- AdjPrices_Wide %>%
+  ?(-date, names_to = "ticker", values_to = "adj_close")
+```
+
+Task: Rename the columns so that they conform to the tickers and does not have the .Adjusted suffix
+
+```{r}
+AdjPrices_Long <- AdjPrices_Long %>%
+  ?(ticker = str_remove(ticker, "\\.Adjusted$"))
+```
+
+
+We will use this long data object throughout the rest of the exercise, unless otherwise stated. 
+
+## Cleaning
+
+Task: Peak at the head and tail of the long data
+
+```{r}
+head(AdjPrices_Long)
+tail(AdjPrices_Long)
+```
+
+Task: Count missing
+
+```{r}
+AdjPrices_Long %>%
+  ?(across(everything(), ~sum(?(.))))
+```
+
+Task: Count negative prices
+
+```{r}
+AdjPrices_Long %>%
+  group_by(ticker) %>%
+  ?(n_negative = sum(adj_close ?))
+```
+
+Q: Any concerns?
+
+A: ?
+
+## Engineering
+
+Task: Generate simple daily net returns
+
+```{r}
+Returns_Long <- AdjPrices_Long %>%
+  arrange(ticker, date) %>%
+  group_by(?) %>%
+  mutate(return = ?) %>%
+  ungroup()
+```
+
+Q: Why is the group_by vital?
+
+A: ?
+
+Task: Verify the returns avoid this trap by filtering on the last days of AAPL and the first days of CAT. 
+
+```{r}
+tickers_sorted <- sort(unique(Returns_Long$ticker))
+current <- "AAPL"
+next_ticker <- tickers_sorted[which(tickers_sorted == current) + 1]
+
+bind_rows(
+  Returns_Long %>% filter(ticker == current) %>% tail(),
+  Returns_Long %>% filter(ticker == next_ticker) %>% head()
+)
+```
+
+
+Q: How do we know we didn't fall into the trap? 
+
+A: ?
+
+Task: Trim the returns object so that it only covers the date range of interest. 
+
+```{r}
+Returns_Long<-Returns_Long %>%
+  filter(?)
+min(Returns_Long$date)
+```
+Task: Clean the missing observations resulting from this engineering.  Use na.omit. 
+
+```{r}
+Returns_Long <- ?
+```
+
+# Exploration
+
+## Univariate Summary
+
+Task: Run the summary function on the return column from Returns_Long.
+
+```{r}
+summary(Returns_Long$?)
+```
+
+Q: What's potentially misleading with this approach?
+
+A: ?
+
+Task: Create a custom dyplr call that generates mean, std dev, skew, kurt, min, q10, q25, q50, q75, q90, max. Apply to each asset.
+
+```{r}
+Returns_Long %>% 
+  dplyr::select(ticker, return) %>%
+  group_by(ticker) %>%
+  summarise(across(where(is.numeric), 
+  .fns = list(
+    min = ~round(min(., na.rm = TRUE), 2),
+    median = ~round(median(., na.rm = TRUE), 2),
+    mean = ~round(mean(., na.rm = TRUE), 3),
+    stdev = ~round(sd(., na.rm = TRUE), 3),
+    skew = ~round(skewness(.,na.rm=TRUE),2),
+    kurt = ~round(kurtosis(.,na.rm=TRUE),2), # Not excess
+    q10 = ~round(quantile(., 0.10, na.rm = TRUE), 2),
+    q25 = ~round(quantile(., 0.25, na.rm = TRUE), 2),
+    q75 = ~round(quantile(., 0.75, na.rm = TRUE), 2),
+    q90 = ~round(?(., ?, na.rm = TRUE), 2),
+    max = ~round(?(., na.rm = TRUE), 2)
+  ),
+  .names = "{fn}"
+  )) 
+```
+
+Q: Does the data follow a normal distribution?
+
+A: ?
+
+Task: Focus on the first asset from the ticker list within your parameter settings. Generate a frequency histogram of returns.
+
+```{r}
+first_ticker<-params$tickers[1]
+temp<-Returns_Long %>%
+  filter(ticker == ?) %>%
+  select(?)
+hist(
+  temp$return,
+  main = first_ticker, 
+  xlab = "Simple Net Daily Return (.05=5%)"
+)
+```
+
+Task: Using that same asset, generate a relative frequency histogram with an overlay of a Normal distribution. Also add a subtitle indicating the start and end dates for returns. 
+
+```{r}
+mu <- mean(temp$return)
+sigma <- sd(temp$return)
+first_day <- Returns_Long$date[?]
+last_day <- Returns_Long$date[?]
+subtitle_text <- paste0(?," through ",?)
+
+ggplot(temp, aes(x = return)) +
+  ?(aes(y = after_stat(density)), bins = 40, fill = "steelblue", color = "white") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sigma), color = "firebrick", linewidth = 1) +
+  labs(
+    title = paste("Relative Frequency Histogram of", first_ticker, "Daily Returns"),
+    subtitle = subtitle_text,
+    x = "Daily Return (0.05 = 5%)",
+    y = "Density (10 = 10%)"
+  ) +
+  theme_minimal()
+```
+
+Q: Does the data follow a normal distribution?
+
+A: ?
+
+Task: Using that same asset, generate a QQ Plot
+
+```{r}
+?(temp$return, main = paste("Normal Q-Q Plot:", first_ticker, "Daily Returns"))
+qqline(temp$return, col = "firebrick")
+```
+
+Q: Interpret the QQ Plot
+
+A: ?
+
+Task: Generate a single figure with violin plots of the densities for each asset side by side.
+
+```{r}
+ggplot(Returns_Long, aes(x = ticker, y = return)) +
+  ?(fill = "steelblue") +
+  labs(
+    title = "Distribution of Daily Returns by Asset",
+    x = "Ticker",
+    y = "Simple Daily Return (.1=10%)"
+  ) +
+  theme_minimal()
+```
+
+Q: Which asset looks most extreme in this violin plot?
+
+A: ?
+
+Task: Build a table of the raw return quantiles (q1, q10, q25, q50, q75, q90, q99) for each ticker, with a Normal(0,1) reference row for comparison.
+
+```{r}
+probs <- c(0.01, 0.10, 0.25, 0.50, 0.75, 0.90, 0.99)
+q_names <- paste0("q", probs * 100)
+
+raw_quantiles <- Returns_Long %>%
+  group_by(ticker) %>%
+  reframe(as_tibble_row(setNames(?(return, probs), q_names)))
+
+normal_quantiles_raw <- as_tibble_row(setNames(?(probs), q_names)) %>%
+  mutate(ticker = "Normal", .before = 1)
+
+bind_rows(normal_quantiles_raw, raw_quantiles)
+```
+
+Q: Does this raw-scale table support the "F is most extreme" impression from the violin plot?
+
+A:?
+
+Task: Standardize each asset relative to its own history (z-score), then regenerate the violin plot on the standardized scale.
+
+```{r}
+Returns_Long_z <- Returns_Long %>%
+  group_by(ticker) %>%
+  mutate(z = ?) %>%
+  ungroup()
+
+ggplot(Returns_Long_z, aes(x = ticker, y = z)) +
+  geom_violin(fill = "steelblue") +
+  labs(
+    title = "Distribution of Standardized (Z-Score) Daily Returns by Asset",
+    x = "Ticker",
+    y = "Z-Score"
+  ) +
+  theme_minimal()
+```
+
+Task: Compute the q1, q10, q25, q50, q75, q90, q99 of each asset's z score. Display in a table where these quantiles are the columns, and the rows pertain to the Normal distribution followed by each ticker.
+
+```{r}
+ticker_quantiles <- Returns_Long_z %>%
+  group_by(ticker) %>%
+  reframe(as_tibble_row(setNames(quantile(?, probs), q_names)))
+
+normal_quantiles <- as_tibble_row(setNames(?(probs), q_names)) %>%
+  mutate(ticker = "Normal", .before = 1)
+
+bind_rows(normal_quantiles, ticker_quantiles)
+```
+
+Q: Now that we've standardized, is F still the most extreme?
+
+A: ? 
+
+## Evolution over time
+
+Task: Focus on the first ticker again. Plot the adjusted closing price using the basic "plot" function.
+
+```{r}
+temp <- Returns_Long %>%
+  filter(ticker == first_ticker) %>%
+  select(date, adj_close)
+
+plot(?, ?, type = "l",
+     xlab = "", ylab = "Adjusted Close",
+     main = paste(first_ticker, "Closing Price"))
+```
+
+Task: Using that same asset, plot the closing price for the last 6mths as a candlestick using the chart_Series function.
+
+```{r}
+?(x = last(get(first_ticker), "6 months"),
+             type = "?", name = first_ticker)
+```
+
+Task: Using that same asset, create a drawdown chart using charts.PerformanceSummary.
+
+```{r}
+?(na.omit(Return.calculate(Cl(get(first_ticker)), method = "discrete")))
+```
+
+Task: Using that same asset, compute 20 day rolling mean returns. Also compute 250 day rolling mean returns. Create a plot overlaying these series.
+
+```{r}
+roll_df <- Returns_Long %>%
+  filter(ticker == ?) %>%
+  arrange(?) %>%
+  mutate(
+    roll_20  = zoo::rollmean(return, k = ?, fill = NA, align = "right"),
+    roll_250 = zoo::rollmean(return, k = ?, fill = NA, align = "right")
+  )
+
+ggplot(roll_df, aes(x = date)) +
+  geom_line(aes(y = roll_20, color = "20-day")) +
+  geom_line(aes(y = roll_250, color = "250-day")) +
+  labs(
+    title = paste(first_ticker, "Rolling Mean Return"),
+    x = "Date", y = "Rolling Mean Return", color = "Window"
+  ) +
+  theme_minimal()
+```
+
+Task: Using that same asset, compute 20 day rolling mean of returns SQUARED. Also compute 250 day rolling mean returns. Create a plot overlaying these series.
+
+```{r}
+roll_sq_df <- Returns_Long %>%
+  filter(ticker == first_ticker) %>%
+  arrange(date) %>%
+  mutate(
+    roll_sq_20  = zoo::rollmean(?, k = 20, fill = NA, align = "right"),
+    roll_sq_250 = zoo::rollmean(?, k = 250, fill = NA, align = "right")
+  )
+
+ggplot(roll_sq_df, aes(x = date)) +
+  geom_line(aes(y = roll_sq_20, color = "20-day")) +
+  geom_line(aes(y = roll_sq_250, color = "250-day")) +
+  labs(
+    title = paste(first_ticker, "Rolling Mean of Squared Return"),
+    subtitle = "Proxy for time-varying volatility",
+    x = "", y = "Rolling Mean Squared Return", color = "Window"
+  ) +
+  theme_minimal()
+```
+
+Task: Using that same asset, compute 20 day rolling standard deviation of returns. Also compute 250 day rolling mean returns. Create a plot overlaying these series.
+
+```{r}
+roll_sd_df <- Returns_Long %>%
+  filter(ticker == first_ticker) %>%
+  arrange(date) %>%
+  mutate(
+    roll_sd_20  = zoo::rollapply(return, width = 20, FUN = ?, fill = NA, align = "right"),
+    roll_sd_250 = zoo::rollapply(return, width = 250, FUN = ?, fill = NA, align = "right")
+  )
+
+ggplot(roll_sd_df, aes(x = date)) +
+  geom_line(aes(y = roll_sd_20, color = "20-day")) +
+  geom_line(aes(y = roll_sd_250, color = "250-day")) +
+  labs(
+    title = paste(first_ticker, "Rolling Standard Deviation of Return"),
+    subtitle = "Proxy for time-varying volatility",
+    x = "", y = "Rolling Standard Deviation", color = "Window"
+  ) +
+  theme_minimal()
+```
+
+Task: Using that same asset, compute 20 day rolling skewness returns. Also compute 250 day rolling mean returns. Create a plot overlaying these series.
+
+```{r}
+roll_skew_df <- Returns_Long %>%
+  filter(ticker == first_ticker) %>%
+  arrange(date) %>%
+  mutate(
+    roll_skew_20  = zoo::rollapply(return, width = 20, FUN = ?, fill = NA, align = "right"),
+    roll_skew_250 = zoo::rollapply(return, width = 250, FUN = ?, fill = NA, align = "right")
+  )
+
+ggplot(roll_skew_df, aes(x = date)) +
+  geom_line(aes(y = roll_skew_20, color = "20-day")) +
+  geom_line(aes(y = roll_skew_250, color = "250-day")) +
+  labs(
+    title = paste(first_ticker, "Rolling Skewness of Return"),
+    x = "", y = "Rolling Skewness", color = "Window"
+  ) +
+  theme_minimal()
+```
+
+Task: Using that same asset, compute 20 day rolling kurtosis returns. Also compute 250 day rolling mean returns. Create a plot overlaying these series.
+
+```{r}
+roll_kurt_df <- Returns_Long %>%
+  filter(ticker == first_ticker) %>%
+  arrange(date) %>%
+  mutate(
+    roll_kurt_20  = zoo::rollapply(return, width = 20, FUN = ?, fill = NA, align = "right"),
+    roll_kurt_250 = zoo::rollapply(return, width = 250, FUN = ?, fill = NA, align = "right")
+  )
+
+ggplot(roll_kurt_df, aes(x = date)) +
+  geom_line(aes(y = roll_kurt_20, color = "20-day")) +
+  geom_line(aes(y = roll_kurt_250, color = "250-day")) +
+  labs(
+    title = paste(first_ticker, "Rolling Kurtosis of Return"),
+    x = "", y = "Rolling Kurtosis", color = "Window"
+  ) +
+  theme_minimal()
+```
+
+Task: Create a plot that indexes the adjusted closing price to \$100 for each asset at the beginning of the sample and then tracks the evolution of that \$100 over time.
+
+```{r}
+indexed_df <- AdjPrices_Long %>%
+  arrange(ticker, date) %>%
+  group_by(ticker) %>%
+  mutate(indexed_price = 1?) %>%
+  ungroup()
+
+ggplot(indexed_df, aes(x = date, y = indexed_price, color = ticker)) +
+  geom_line() +
+  labs(
+    title = "Growth of $100 Invested, by Asset",
+    x = "", y = "Value of $100 Investment", color = "Ticker"
+  ) +
+  theme_minimal()
+```
+
+## Comovement
+
+Task: Pivot returns to wide format for matrix-based comovement analysis.
+
+```{r}
+Returns_Wide <- Returns_Long %>%
+  select(date, ticker, return) %>%
+  ?(names_from = ticker, values_from = return) %>%
+  arrange(date)
+```
+
+Task: Compute the covariance matrix of returns
+
+```{r}
+cov_matrix <- Returns_Wide %>%
+  select(-date) %>%
+  ?()
+round(cov_matrix, 6)
+```
+
+Task: Compute the correlation matrix of returns
+
+```{r}
+cor_matrix <- Returns_Wide %>%
+  select(-date) %>%
+  ?()
+round(cor_matrix, 3)
+```
+
+Task: Visualize the comovement with pairs
+
+```{r}
+Returns_Wide %>%
+  select(-?) %>%
+  pairs(main = "Pairwise Scatterplots of Daily Returns")
+```
+
+Task: Visualization the correlation with chart.Correlation
+
+```{r}
+Returns_Wide %>%
+  select(-date) %>%
+  ?(histogram = TRUE)
+```
+
+Q: What do the red stars indicate? Interpret within our case. 
+
+A:  ?
+
+Task: Compute 250 day rolling correlation between the first and second tickers in the ticker list. Plot this relationship.
+
+```{r}
+second_ticker <- params$tickers[2]
+
+roll_cor_df <- Returns_Wide %>%
+  arrange(date) %>%
+  mutate(
+    roll_cor_250 = zoo::rollapply(
+      cbind(.data[[first_ticker]], .data[[second_ticker]]),
+      width = 250,
+      FUN = function(x) ?(x[, 1], x[, 2]),
+      by.column = FALSE,
+      fill = NA,
+      align = "right"
+    )
+  )
+
+ggplot(roll_cor_df, aes(x = date, y = roll_cor_250)) +
+  geom_line() +
+  labs(
+    title = paste("250-Day Rolling Correlation:", first_ticker, "vs", second_ticker),
+    x = "", y = "Rolling Correlation"
+  ) +
+  theme_minimal()
+```
+
+Q: How stable is this correlation over time?
+
+A: ?
+
+## Temporal Dependence
+
+Task: Compute the ACF for each asset's returns. Let's use ggACF applied to Returns_Wide wrapped in a function. 
+
+```{r}
+acf_plots <- purrr::map(params$tickers, function(tk) { 
+  forecast::?(?[[tk]]) +
+    ggplot2::labs(title = tk) 
+})
+
+patchwork::wrap_plots(acf_plots, ncol = 3)
+```
+
+Q: Is there significant autocorrelation in daily returns?
+
+A: ?
+
+Task: Pick the first ticker. Compute 5 lags of that asset's returns.
+
+```{r}
+lag_df <- Returns_Wide %>%
+  arrange(date) %>%
+  transmute(
+    date,
+    lag0 = .data[[first_ticker]],
+    lag1 = lag(.data[[first_ticker]], ?),
+    lag2 = lag(.data[[first_ticker]], ?),
+    lag3 = lag(.data[[first_ticker]], ?),
+    lag4 = lag(.data[[first_ticker]], ?),
+    lag5 = lag(.data[[first_ticker]], ?)
+  ) %>%
+  na.omit()
+```
+
+Task: Visualize the correlation among those lags using ggpairs 
+
+```{r}
+ggpairs(
+  ? %>% select(-date),
+  upper = list(continuous = wrap("cor", size = 6)),
+  diag  = list(continuous = wrap("densityDiag")),
+  lower = list(continuous = wrap("points"))
+)
+
+```
+
+Q: Interpret? 
+
+A: ?
+
+Task: Compute the ACF for each asset's squared returns. We can do this several ways.  In this exercise let's use ggAcf wrapped in a function. 
+
+```{r}
+sq_acf_plots <- purrr::map(params$tickers, function(tk) {
+  ?(Returns_Wide[[tk]]^2) + labs(title = tk)
+})
+
+wrap_plots(sq_acf_plots, ncol = 3)
+```
+
+Q: How does this compare to the ACF of raw returns?
+
+A: ?
+
+Task: Use the same asset as above. Compute 5 lags of that asset's squared returns.
+
+```{r}
+sq_lag_df <- Returns_Wide %>%
+  arrange(date) %>%
+  transmute(
+    date,
+    lag0 = .data[[first_ticker]]?,
+    lag1 = lag(.data[[first_ticker]]?, 1),
+    lag2 = lag(.data[[first_ticker]]?, 2),
+    lag3 = lag(.data[[first_ticker]]?, 3),
+    lag4 = lag(.data[[first_ticker]]?, 4),
+    lag5 = lag(.data[[first_ticker]]?, 5)
+  ) %>%
+  na.omit()
+```
+
+Task: Visualize the correlation among those lags. Use ggpairs. 
+
+```{r}
+ggpairs(
+  ? %>% select(-?),
+  upper = list(continuous = wrap("cor", size = 6)),
+  diag  = list(continuous = wrap("densityDiag")),
+  lower = list(continuous = wrap("points"))
+)
+
+```
+
+Q: What is the implication of these results? 
+
+A: ?
+
+Task: Pick the first and second tickers Compute the CCF.
+
+```{r}
+?(Returns_Wide[[first_ticker]], Returns_Wide[[second_ticker]],
+    main = paste("CCF:", first_ticker, "vs", second_ticker))
+```
+
+Q: What does the CCF show?
+
+A: ?
+
+Task: Lag the second asset 1,2,3,4,5 periods. Visualize the correlations between the first asset and the second asset's returns and it's lags.
+
+```{r}
+ccf_lag_df <- Returns_Wide %>%
+  arrange(date) %>%
+  transmute(
+    date,
+    asset1 = .data[[first_ticker]],
+    lag0 = .data[[second_ticker]],
+    lag1 = lag(.data[[second_ticker]], 1),
+    lag2 = lag(.data[[second_ticker]], 2),
+    lag3 = lag(.data[[second_ticker]], 3),
+    lag4 = lag(.data[[second_ticker]], 4),
+    lag5 = lag(.data[[second_ticker]], 5)
+  ) %>%
+  na.omit()
+
+cor_vec <- sapply(ccf_lag_df %>% select(starts_with("lag")),
+                   function(x) ?(ccf_lag_df$asset1, x))
+
+cor_df <- tibble(lag = 0:5, correlation = cor_vec)
+
+ggplot(cor_df, aes(x = lag, y = correlation)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = paste0("Correlation of ", first_ticker, "'s Return with ", second_ticker, "'s Lagged Return"),
+    x = paste(second_ticker, "Lag (days)"), y = "Correlation"
+  ) +
+  theme_minimal()
+```
+
+Q: Does lagging the second asset's return reveal any predictive relationship?
+
+A: 
