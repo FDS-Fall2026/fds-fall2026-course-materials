@@ -1,0 +1,928 @@
+---
+title: "Visualizing Financial Data"
+subtitle: "Analytics for Financial Data Science"
+author: Mike Aguilar
+format:
+  html:
+    toc: true
+    toc-depth: 5
+    toc-location: left
+    code-fold: true
+editor: visual
+execute:
+  warning: false
+  echo: true
+---
+
+# Background
+
+- An investment analyst monitors four assets and wants to compare their historical performance and risk.
+- The practical goal is to develop a small interactive dashboard that lets a user select two assets and a date range.
+- The dashboard will display:
+  - an indexed-price chart for comparing performance; and
+  - return histograms for comparing the distributions of daily returns.
+- We will build the application progressively:
+  1.  create static visualizations with `ggplot2`;
+  2.  reorganize comparisons with `facet_wrap()`;
+  3.  add interactivity with `plotly`; and
+  4.  connect user inputs to multiple visualizations with Shiny.
+
+# Housekeeping
+
+Task: Reset the R session and load the packages used in this lesson.
+
+```{r}
+#| warning: false
+
+cat("\014")  # clear the console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+suppressPackageStartupMessages(library(plotly))
+```
+
+# Data
+
+## Application
+
+The data represent four fictional exchange-traded funds. The series are simulated so that the lesson is reproducible and does not depend on an external data provider.
+
+| Ticker | Asset           | Simulated Characteristics                 |
+|--------|-----------------|-------------------------------------------|
+| TECH   | Technology Fund | Higher growth and volatility              |
+| BANK   | Banking Fund    | Moderate growth with a temporary drawdown |
+| ENERGY | Energy Fund     | Cyclical and relatively volatile          |
+| BOND   | Bond Fund       | Lower growth and volatility               |
+
+The simulated differences are instructional features. They allow us to evaluate whether different visualizations reveal different aspects of the same data.
+
+## Generate
+
+Task: Load a reproducible sample of daily prices for four fictional assets. The data are simulated once by [`GenerateDataVizDemoData.R`](GenerateDataVizDemoData.R) and saved to `Data/DataVizDemoData.rds`, so this document and the companion Shiny app (`app.R`) share exactly the same observations. Weekdays are used as a simple approximation to trading days.
+
+```{r}
+data_path <- here("?", "?")
+
+if (!file.exists(data_path)) {
+  source(here("Topics", "VizForFDS", "GenerateDataVizDemoData.R"))
+}
+
+viz_demo_data <- readRDS(data_path)
+asset_data <- viz_demo_data$asset_data
+asset_specifications <- viz_demo_data$asset_specifications
+
+head(asset_data) %>%
+  mutate(
+    price = round(price, 2),
+    daily_return = round(daily_return, 4),
+    indexed_price = round(indexed_price, 2)
+  ) %>%
+  kable(caption = "First six simulated asset-date observations")
+```
+
+## Data Dictionary
+
+Task: Create a data dictionary for the analytical dataset.
+
+```{r}
+data_dictionary <- tribble(
+  ~variable,        ~type,      ~description,
+  "date",           "Date",     "Approximate trading date",
+  "ticker",         "Character", "Short asset identifier",
+  "asset_name",     "Character", "Descriptive asset name",
+  "price",          "Numeric",   "Simulated closing price",
+  "daily_return",   "Numeric",   "One-period simple return in decimal form",
+  "indexed_price",  "Numeric",   "Price indexed to 100 on the asset's first date"
+)
+
+kable(
+  data_dictionary,
+  caption = "Data dictionary"
+)
+```
+
+Q: What does one row of `asset_data` represent? Why is this long format useful for visualization?
+
+A:
+
+?
+
+## Validate
+
+Task: Verify that every ticker-date combination is unique and that the variables used in the lesson do not contain missing values.
+
+```{r}
+duplicate_observations <- asset_data %>%
+  dplyr::count(ticker, date, name = "n") %>%
+  filter(n > 1)
+
+missing_summary <- asset_data %>%
+  summarise(across(everything(), ~ sum(?(.x)))) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "missing_values"
+  )
+
+if (nrow(duplicate_observations) > 0) {
+  stop("Resolve duplicated ticker-date observations before continuing.")
+}
+
+if (any(missing_summary$missing_values > 0)) {
+  stop("Resolve missing values before continuing.")
+}
+
+message("No duplicated ticker-date observations were found.")
+missing_summary %>%
+  kable(caption = "Missing-value summary")
+```
+
+# Static Visualization
+
+## The Grammar of Graphics
+
+The grammar of graphics treats a visualization as a collection of components that can be assembled and modified systematically.
+
+``` r
+ggplot(data, aes(x = ..., y = ...)) +
+  geom_*() +
+  scale_*() +
+  labs() +
+  theme_*()
+```
+
+| Component | Role | Example |
+|------------------------|------------------------|------------------------|
+| Data | Observations supplied to the plot | `asset_data` |
+| Aesthetic mapping | Connects variables to visual properties | `aes(x = date, y = price)` |
+| Geometry | Determines how observations are drawn | `geom_line()` |
+| Scale | Controls how data values become visual values | `scale_y_continuous()` |
+| Labels | Communicate titles, axes, legends, and sources | `labs()` |
+| Theme | Controls non-data elements | `theme_minimal()` |
+
+Q: Why is ggplot code connected with `+` signs?
+
+A:
+?
+
+### One Asset: Basic Line Plot
+
+Task: Filter the data to TECH and create a line plot of its price over time.
+
+```{r}
+tech_data <- asset_data %>%
+  filter(?)
+
+tech_basic_plot <- tech_data %>%
+  ggplot(aes(x = ?, y = ?)) +
+  geom_line()
+
+tech_basic_plot
+```
+
+Q: What information is supplied by `ggplot(aes(x = date, y = price))`, and what information is supplied by `geom_line()`?
+
+A:
+
+?
+
+
+Q: Why is a line plot usually more useful than an unconnected scatterplot for an ordered price series?
+
+A:
+
+?
+
+### Aesthetic Mappings and Fixed Properties
+
+Task: Make the TECH line dark blue and slightly thicker.
+
+```{r}
+tech_fixed_color_plot <- tech_data %>%
+  ggplot(aes(?)) +
+  ?(
+    ? = "#00539B",
+    ? = 0.9
+  )
+
+tech_fixed_color_plot
+```
+
+Q: Why are `color` and `linewidth` placed outside `aes()` in this plot?
+
+A:
+
+?
+
+### Labels, Scales, and Themes
+
+Task: Refine the TECH plot by adding informative labels, formatting the vertical axis as dollars, applying a minimal theme, and moving the title and source into a clear visual hierarchy.
+
+```{r}
+tech_polished_plot <- tech_data %>%
+  ggplot(aes(x = date, y = price)) +
+  geom_line(
+    color = "#00539B",
+    linewidth = 0.9
+  ) +
+  scale_x_date(
+    date_breaks = "3 months",
+    date_labels = "%b\n%Y",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  scale_y_continuous(
+    labels = label_dollar(accuracy = 1)
+  ) +
+  labs(
+    ? = "Technology Fund Price",
+    ? = "Simulated daily closing prices",
+    x = NULL,
+    ? = "Price",
+    caption = "Source: Simulated data"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(color = "gray40")
+  )
+
+tech_polished_plot
+```
+
+Q: How do labels, scales, and themes differ?
+
+A:
+?
+
+Q: Why might a polished chart remove minor grid lines but retain major grid lines?
+
+A:
+?
+
+## Comparing Multiple Assets
+
+### Multiple Lines: Raw Prices
+
+Task: Create one plot containing the raw prices of all four assets. Map `ticker` to color.
+
+```{r}
+raw_price_plot <- asset_data %>%
+  ggplot(
+    aes(
+      x = date,
+      y = price,
+      color = ?
+    )
+  ) +
+  geom_line(linewidth = 0.75) +
+  scale_x_date(
+    date_breaks = "3 months",
+    date_labels = "%b\n%Y",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  scale_y_continuous(
+    labels = label_dollar(accuracy = 1)
+  ) +
+  labs(
+    title = "Asset Prices",
+    subtitle = "Raw prices are not a common performance scale",
+    x = NULL,
+    y = "Price",
+    color = "Ticker",
+    caption = "Source: Simulated data"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom"
+  )
+
+raw_price_plot
+```
+
+Q: What causes ggplot to draw four lines instead of connecting all observations into one line?
+
+A:
+
+?
+
+Q: Why is comparing raw price levels generally not the same as comparing investment performance?
+
+A:
+?
+
+### Multiple Lines: Indexed Prices
+
+For each asset, indexed price is:
+
+$$
+IndexedPrice_{i,t} = 100\left(\frac{Price_{i,t}}{Price_{i,0}}\right).
+$$
+
+Task: Plot all four assets using prices indexed to 100 on each asset's first observation.
+
+```{r}
+indexed_price_plot <- asset_data %>%
+  ggplot(
+    aes(
+      x = ?,
+      y = ?,
+      color = ?
+    )
+  ) +
+  geom_hline(
+    yintercept = 100,
+    color = "gray55",
+    linewidth = 0.5,
+    linetype = "dashed"
+  ) +
+  geom_line(linewidth = 0.8) +
+  scale_x_date(
+    date_breaks = "3 months",
+    date_labels = "%b\n%Y",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  scale_y_continuous(
+    labels = label_number(accuracy = 1)
+  ) +
+  labs(
+    title = "Indexed Asset Prices",
+    subtitle = "Each asset equals 100 on its first observation",
+    x = NULL,
+    y = "Indexed Price",
+    color = "Ticker",
+    caption = "Source: Simulated data"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom"
+  )
+
+indexed_price_plot
+```
+
+Q: How should we interpret an indexed price of 112? How should we interpret an indexed price of 94?
+
+A:
+
+?
+
+Q: What analytical comparison becomes easier in the indexed-price plot? What information from the raw-price plot is no longer visible?
+
+A:
+
+?
+## Faceted Comparisons
+
+### Small Multiples
+
+Task: Use `facet_wrap()` to place each asset's indexed price in a separate panel. Arrange the panels in two columns and retain a common vertical scale.
+
+```{r}
+faceted_price_plot <- asset_data %>%
+  ggplot(aes(x = date, y = indexed_price)) +
+  geom_hline(
+    yintercept = 100,
+    color = "gray55",
+    linewidth = 0.45,
+    linetype = "dashed"
+  ) +
+  geom_line(
+    color = "#00539B",
+    linewidth = 0.75
+  ) +
+  ?(
+    vars(?),
+    ncol = ?
+  ) +
+  scale_x_date(
+    date_breaks = "6 months",
+    date_labels = "%b\n%Y",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  scale_y_continuous(
+    labels = label_number(accuracy = 1)
+  ) +
+  labs(
+    title = "Indexed Asset Prices by Ticker",
+    subtitle = "Common axes preserve comparisons across panels",
+    x = NULL,
+    y = "Indexed Price",
+    caption = "Source: Simulated data"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold")
+  )
+
+faceted_price_plot
+```
+
+Q: What are the respective advantages of the overlaid and faceted indexed-price plots?
+
+A:
+?
+
+### Common and Free Scales
+
+Task: Create a second faceted plot with a free vertical scale in each panel.
+
+```{r}
+faceted_free_y_plot <- faceted_price_plot +
+  facet_wrap(
+    vars(ticker),
+    ncol = 2,
+    scales = "?"
+  ) +
+  labs(
+    title = "Indexed Asset Prices by Ticker",
+    subtitle = "Free vertical scales emphasize within-asset variation"
+  )
+
+faceted_free_y_plot
+```
+
+Q: What does a free vertical scale make easier to see? What comparison does it make harder or potentially misleading?
+
+A:
+
+?
+
+# Interactive Visualization
+
+## Plotly
+
+### Motivation
+
+Q: What can an interactive chart provide that a static chart cannot?
+
+A:
+?
+
+### Convert a ggplot
+
+Task: Convert the indexed-price ggplot to an interactive Plotly figure.
+
+```{r}
+indexed_price_plotly_basic <- ?(
+  indexed_price_plot,
+  tooltip = c("x", "y", "colour")
+) %>%
+  plotly::layout(
+    legend = list(orientation = "h")
+  )
+
+indexed_price_plotly_basic
+```
+
+Q: What is gained by passing an existing ggplot to `ggplotly()`? What control might eventually require native Plotly code?
+
+A:
+
+?
+
+### Purposeful Tooltips
+
+Task: Build the indexed-price chart with native Plotly syntax. Design a tooltip that reports the asset, date, indexed price, and cumulative return.
+
+```{r}
+plotly_tooltip_data <- asset_data %>%
+  mutate(
+    cumulative_return = indexed_price / 100 - 1,
+    tooltip = paste0(
+      "<b>", asset_name, "</b>",
+      "<br>Date: ", format(date, "%B %d, %Y"),
+      "<br>Indexed price: ", number(indexed_price, accuracy = 0.1),
+      "<br>Cumulative return: ", percent(cumulative_return, accuracy = 0.1)
+    )
+  )
+
+indexed_price_plotly <- ?(
+  data = plotly_tooltip_data,
+  x = ~date,
+  y = ~indexed_price,
+  color = ~ticker,
+  type = "scatter",
+  mode = "lines",
+  text = ~tooltip,
+  hoverinfo = "text"
+) %>%
+  plotly::layout(
+    title = list(
+      text = paste0(
+        "Indexed Asset Prices",
+        "<br><sup>Hover for exact values; select legend items to show or hide series</sup>"
+      ),
+      x = 0.02
+    ),
+    xaxis = list(title = ""),
+    yaxis = list(title = "Indexed Price"),
+    legend = list(
+      title = list(text = "Ticker"),
+      orientation = "h",
+      x = 0,
+      y = -0.18
+    ),
+    hovermode = "closest"
+  )
+
+indexed_price_plotly
+```
+
+Q: Why not place every available variable in the tooltip?
+
+A:
+
+?
+### Date-Range Controls
+
+Task: Add one-month, three-month, six-month, one-year, and full-sample buttons to the horizontal axis. Also add a range slider.
+
+```{r}
+indexed_price_plotly_controls <- indexed_price_plotly %>%
+  plotly::layout(
+    # The two-line title (title + hover subtitle) needs more room than the
+    # default top margin, which otherwise crowds the range-selector buttons.
+    # The added range slider also needs more room below the axis, so the
+    # bottom margin grows and the legend moves further down to clear it.
+    margin = list(t = 110, b = 100),
+    legend = list(
+      title = list(text = "Ticker"),
+      orientation = "h",
+      x = 0,
+      y = -0.35
+    ),
+    xaxis = list(
+      title = "",
+      rangeselector = list(
+        buttons = list(
+          list(
+            count = 1,
+            label = "1m",
+            step = "month",
+            stepmode = "backward"
+          ),
+          list(
+            count = 3,
+            label = "3m",
+            step = "month",
+            stepmode = "backward"
+          ),
+          list(
+            count = 6,
+            label = "6m",
+            step = "month",
+            stepmode = "backward"
+          ),
+          list(
+            count = 1,
+            label = "?",
+            step = "year",
+            stepmode = "backward"
+          ),
+          list(
+            label = "All",
+            step = "all"
+          )
+        )
+      ),
+      rangeslider = list(visible = TRUE)
+    )
+  )
+
+indexed_price_plotly_controls
+```
+
+Q: Does selecting a shorter Plotly date range change the indexed-price calculation?
+
+A:
+
+?
+
+Q: How does clicking a Plotly legend entry differ from filtering the underlying data?
+
+A:
+
+?
+
+## Shiny
+
+### What Shiny Adds
+
+Shiny connects three elements:
+
+1.  **Inputs:** controls through which the user communicates a selection.
+2.  **Reactive expressions:** calculations that rerun when their inputs change.
+3.  **Outputs:** tables, plots, or other objects rebuilt from reactive results.
+
+In our application, the user selects two assets and a date range. One reactive dataset filters the observations and re-indexes both selected assets to 100 on the first selected date. Both dashboard visualizations consume that same reactive dataset.
+
+Q: What is the main difference between Plotly interactivity and Shiny reactivity in this lesson?
+
+A:
+
+?
+
+Q: Why does the Shiny code below appear with `eval: false` instead of running inside this document?
+
+A:
+?
+### Embedded Shiny Document or Separate `app.R`?
+
+| Design | Advantages | Limitations |
+|------------------------|------------------------|------------------------|
+| Shiny embedded in a QMD | Integrates exposition, tasks, code, answers, and the live application; supports the progressive structure of this lesson; keeps the instructional artifact together | Requires a Shiny-capable R process; the rendered document is not a standalone static HTML file; a long lesson can mix instructional and application code |
+| Separate `app.R` | Follows the conventional Shiny application structure; easier to expand into modules, supporting files, tests, and a larger deployment; separates the application from the lesson narrative | Requires students to move between the QMD and another file; duplicates or separates some context; weakens the one-document progression used here |
+
+For this lesson, the dashboard code is still presented inline, with `eval: false`, so the reactive structure builds progressively alongside the narrative. It actually runs from a separate `app.R`, which keeps the instructional flow of an embedded document while avoiding the cost — and the project-preview fragility described above — of requiring a live Shiny session just to render the lesson. A larger dashboard, with modules, multiple pages, supporting assets, or independent deployment, would make a fully separate `app.R` design worthwhile regardless of this concern.
+
+::: {.callout-important collapse="false" title="Execution Requirement"}
+The code chunks in this section have `eval: false`: they are shown for exposition and do not run when this document is rendered. The live dashboard is the separate file `app.R`, located alongside this document. It loads the same simulated data (`Data/DataVizDemoData.rds`, produced by `GenerateDataVizDemoData.R`), so it stays in sync with the code shown here.
+
+Launch the dashboard with:
+
+``` r
+shiny::runApp("app.R")
+```
+
+or open `app.R` in Positron/RStudio and use **Run App**.
+:::
+
+### User Interface
+
+Task: Create inputs that allow the user to select two assets and a date range. Create placeholders for an indexed-price chart and faceted return histograms.
+
+```{r}
+#| echo: true
+#| eval: false
+
+fluidRow(
+  column(
+    width = 5,
+    selectizeInput(
+      inputId = "selected_assets",
+      label = "Select exactly two assets:",
+      choices = setNames(
+        asset_specifications$ticker,
+        paste0(
+          asset_specifications$ticker,
+          " — ",
+          asset_specifications$asset_name
+        )
+      ),
+      selected = c("TECH", "BANK"),
+      multiple = TRUE,
+      options = list(
+        maxItems = 2,
+        plugins = list("remove_button")
+      )
+    )
+  ),
+  column(
+    width = 5,
+    dateRangeInput(
+      inputId = "selected_dates",
+      label = "Select a date range:",
+      start = min(asset_data$date),
+      end = max(asset_data$date),
+      min = min(asset_data$date),
+      max = max(asset_data$date),
+      format = "yyyy-mm-dd"
+    )
+  )
+)
+
+fluidRow(
+  column(
+    width = 12,
+    plotlyOutput(
+      outputId = "shiny_price_plot",
+      height = "430px"
+    )
+  )
+)
+
+fluidRow(
+  column(
+    width = 12,
+    plotlyOutput(
+      outputId = "shiny_return_histograms",
+      height = "390px"
+    )
+  )
+)
+```
+
+Q: What roles do `inputId` and `outputId` play?
+
+A:
+
+?
+
+### Reactive Data
+
+Task: Create one reactive expression that validates the inputs, filters the selected observations, and re-indexes each asset to 100 on the first date in the selected range.
+
+```{r}
+#| eval: false
+
+selected_asset_data <- reactive({
+  validate(
+    need(
+      length(input$selected_assets) == 2,
+      "Select exactly two assets."
+    ),
+    need(
+      length(input$selected_dates) == 2,
+      "Select a valid start and end date."
+    )
+  )
+
+  filtered_data <- asset_data %>%
+    filter(
+      ticker %in% input$selected_assets,
+      date >= input$selected_dates[1],
+      date <= input$selected_dates[2]
+    )
+
+  validate(
+    need(
+      nrow(filtered_data) > 0,
+      "The selected date range contains no observations."
+    ),
+    need(
+      n_distinct(filtered_data$ticker) == 2,
+      "The selected period must contain observations for both assets."
+    )
+  )
+
+  filtered_data %>%
+    group_by(ticker) %>%
+    arrange(date, .by_group = TRUE) %>%
+    mutate(
+      selected_period_index = 100 * price / first(price),
+      selected_period_return = selected_period_index / 100 - 1
+    ) %>%
+    ungroup()
+})
+```
+
+Q: Why place the filtering and indexing logic in one reactive expression rather than repeat it inside both output definitions?
+
+A:
+?
+
+Q: Why recompute `selected_period_index` rather than use the original `indexed_price` variable?
+
+A:
+?
+
+### Reactive Indexed-Price Chart
+
+Task: Render an interactive indexed-price chart from `selected_asset_data()`.
+
+```{r}
+#| eval: false
+
+output$shiny_price_plot <- renderPlotly({
+  plot_data <- selected_asset_data() %>%
+    mutate(
+      tooltip = paste0(
+        "<b>", asset_name, "</b>",
+        "<br>Date: ", format(date, "%B %d, %Y"),
+        "<br>Selected-period index: ",
+        number(selected_period_index, accuracy = 0.1),
+        "<br>Selected-period return: ",
+        percent(selected_period_return, accuracy = 0.1)
+      )
+    )
+
+  plot_ly(
+    data = plot_data,
+    x = ~date,
+    y = ~selected_period_index,
+    color = ~ticker,
+    type = "scatter",
+    mode = "lines",
+    text = ~tooltip,
+    hoverinfo = "text"
+  ) %>%
+    plotly::layout(
+      title = list(
+        text = paste0(
+          "Selected Assets: Indexed Prices",
+          "<br><sup>Each asset equals 100 on its first selected date</sup>"
+        ),
+        x = 0.02
+      ),
+      xaxis = list(title = ""),
+      yaxis = list(title = "Indexed Price"),
+      legend = list(
+        title = list(text = "Ticker"),
+        orientation = "h",
+        x = 0,
+        y = -0.18
+      ),
+      hovermode = "closest"
+    )
+})
+```
+
+### Reactive Return Histograms
+
+Task: Render faceted histograms of daily returns for the same selected observations. Use common bins and axes so that the return distributions remain comparable.
+
+```{r}
+#| eval: false
+
+output$shiny_return_histograms <- renderPlotly({
+  histogram_data <- selected_asset_data()
+
+  return_histogram_plot <- histogram_data %>%
+    ggplot(aes(x = daily_return, fill = ticker)) +
+    geom_histogram(
+      binwidth = 0.005,
+      boundary = 0,
+      color = "white",
+      linewidth = 0.25,
+      alpha = 0.85
+    ) +
+    geom_vline(
+      xintercept = 0,
+      color = "gray35",
+      linewidth = 0.5,
+      linetype = "dashed"
+    ) +
+    facet_wrap(vars(ticker), ncol = 2) +
+    scale_x_continuous(
+      labels = label_percent(accuracy = 1)
+    ) +
+    labs(
+      title = "Selected Assets: Daily Return Distributions",
+      subtitle = "Common bins and axes support cross-asset comparison",
+      x = "Daily Return",
+      y = "Number of Observations"
+    ) +
+    theme_minimal(base_size = 11) +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = "none",
+      plot.title = element_text(face = "bold"),
+      strip.text = element_text(face = "bold")
+    )
+
+  ggplotly(
+    return_histogram_plot,
+    tooltip = c("x", "count")
+  )
+})
+```
+
+Q: Why do the histograms use `daily_return` rather than `selected_period_index`?
+
+A:
+
+?
+
+Q: Why use common histogram bins and axes across the two facets?
+
+A:
+
+?
+
+### Dashboard Interpretation
+
+Task: Use the dashboard to compare TECH and BOND over the full sample and then over a shorter period. Evaluate both cumulative performance and the dispersion of daily returns.
+
+Q: Why might changing the selected date range alter both the apparent performance ranking and the return histograms?
+
+A:
+
+?
+
+Q: What evidence would support the statement that one selected asset was riskier than another? What limitations remain?
+
+A:
+?
+
+# Visualization Design Principles
+
+Q: What general principles from this lesson extend beyond financial time series?
+
+A:
+
+?
+
+# Common Errors
+
+Q: What common implementation and interpretation errors should we avoid?
+
+A:
+?
