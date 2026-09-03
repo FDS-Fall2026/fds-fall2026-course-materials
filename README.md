@@ -13,6 +13,11 @@ Mike Aguilar | mike.aguilar@duke.edu
 - Please note that many of the links on this README won't be active until we've discussed that topic in class and I've pushed the accompanying materials to the repo. 
 - If we've completed a topic in class and the materials aren't pushed, please alert me. 
 
+# Admin
+
+- [Syllabus](https://fds-fall2026.github.io/fds-fall2026-course-materials/Supporting/FDS-Fall2026-Syllabus.pdf)
+- [Course Project Guidelines](https://fds-fall2026.github.io/fds-fall2026-course-materials/Supporting/FDS-Fall2026-CourseProject.pdf)
+
 # Computing for FDS
 
 - Lecture [Notes](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/ComputingForFDS/TechnicalComputingGuide.html) containing details on our computing tools, installation instructions, and best practices. 
