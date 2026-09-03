@@ -7,7 +7,6 @@ All grades will be stored and communicated via the official Canvas site for this
 Please contact with me with any questions or suggestions. 
 Mike Aguilar | mike.aguilar@duke.edu 
 
-TEST
 
 # Updating 
 
@@ -25,11 +24,11 @@ TEST
 
 # Data for FDS
 
-- OHLCV Exercises [Skeleton QMD](Topics/DataForFDS/OHLCV-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/OHLCV.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/OHLCV-Complete.html)
-- Fama–French Factors Exercises [Skeleton QMD](Topics/DataForFDS/FamaFrenchFactors-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/FamaFrenchFactors.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/FamaFrenchFactors-Complete.html)
-- Engineering Exercises: [Skeleton QMD](Topics/DataForFDS/Engineering-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/Engineering.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/Engineering-Complete.html)
-- Macro Data Exercises: [Skeleton QMD](Topics/DataForFDS/MacroData-Skeleton.qmd) | [Complete HTML](Topics/DataForFDS/MacroData.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/MacroData-Complete.html)
-- Corporate Fundamentals Exercises: [Skeleton QMD](Topics/DataForFDS/Fundamentals-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/Fundamentals.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/Fundamentals-Complete.html)
+- OHLCV Exercises [Skeleton QMD](Topics/DataForFDS/OHLCV-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/OHLCV-Complete.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/OHLCV-Complete.html)
+- Fama–French Factors Exercises [Skeleton QMD](Topics/DataForFDS/FamaFrenchFactors-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/FamaFrenchFactors-Complete.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/FamaFrenchFactors-Complete.html)
+- Engineering Exercises: [Skeleton QMD](Topics/DataForFDS/Engineering-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/Engineering-Complete.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/Engineering-Complete.html)
+- Macro Data Exercises: [Skeleton QMD](Topics/DataForFDS/MacroData-Skeleton.qmd) | [Complete HTML](Topics/DataForFDS/MacroData-Complete.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/MacroData-Complete.html)
+- Corporate Fundamentals Exercises: [Skeleton QMD](Topics/DataForFDS/Fundamentals-Skeleton.qmd) | [Complete QMD](Topics/DataForFDS/Fundamentals-Complete.qmd) | [Complete HTML](https://fds-fall2026.github.io/fds-fall2026-course-materials/Topics/DataForFDS/Fundamentals-Complete.html)
 
 
 # Analytics for FDS

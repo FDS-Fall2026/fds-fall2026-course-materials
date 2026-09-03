@@ -1,0 +1,358 @@
+---
+title: "Financial Data Fundamentals"
+subtitle: "Macro Data"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+  enabled: false
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Data Overview
+
+## Data Type
+
+Macroeconomic data describe the state and evolution of an economy by measuring economic activity, prices, labor markets, production, trade, and financial conditions. These datasets are typically produced by government agencies, central banks, and international organizations.
+
+Common categories include:
+
+- Economic output (GDP)
+- Labor markets
+- Inflation
+- Interest rates
+- Money supply
+- Housing
+- Manufacturing
+- Consumer spending
+- International trade
+- Financial conditions
+
+Unlike market data, macroeconomic data are typically released on scheduled publication dates and are revised over time.
+
+## Why It Matters
+
+Macroeconomic data answer questions about the state of the economy and the business cycle.
+
+Common applications include:
+
+- Economic forecasting
+- Asset allocation
+- Monetary policy analysis
+- Fixed-income analysis
+- Equity valuation
+- Risk management
+- Recession prediction
+- Factor investing
+
+Examples of products built using macroeconomic data include:
+
+- Economic dashboards
+- Recession probability models
+- Inflation monitoring systems
+- Yield curve dashboards
+- Market commentary reports
+- Portfolio allocation tools
+
+## Data Structure
+
+Unit of observation:
+
+One economic variable measured at one point in time.
+
+Unlike market data, macroeconomic observations are typically reported for a period (e.g., a month or quarter), even though they are indexed by a single date.
+
+Typical frequencies
+
+- Daily
+- Weekly
+- Monthly
+- Quarterly
+- Annual
+
+Primary identifiers
+
+- Series ID
+- Observation date
+
+Common variables
+
+- Observation date
+- Value
+- Units
+- Frequency
+- Seasonal adjustment
+- Release date
+- Revision date (vintage)
+
+Structure
+
+- One Series: Rows = observation dates \| Columns = values
+- Multiple Series: Rows = observation dates \| Columns = economic variables
+
+Temporal considerations
+
+- Missing observations are common because different series have different frequencies.
+- Data are often revised after initial publication.
+- Some analyses require using the first published ("real-time") values rather than revised values.
+
+## Providers
+
+Many organizations publish macroeconomic data. They differ in geographic coverage, frequency, revision history, accessibility, and cost.
+
+### Government Agencies
+
+Primary producers of official U.S. macroeconomic statistics.
+
+| Provider | Examples |
+|:--------------------------|:--------------------------------------------|
+| Bureau of Economic Analysis (BEA) | GDP, Personal Income, PCE |
+| Bureau of Labor Statistics (BLS) | CPI, PPI, Employment, Unemployment |
+| U.S. Census Bureau | Retail Sales, Housing Starts, Trade |
+| U.S. Treasury | Treasury yields, auction statsitics, debt statistics |
+| Federal Reserve Board | Industrial Production, Capacity Utilization |
+
+### Data Aggregators
+
+Combine data from many official sources into one platform.
+
+| Provider | Notes |
+|:------------------------|:----------------------------------------------|
+| FRED (Federal Reserve Bank of St. Louis) | Most popular free U.S. macroeconomic database |
+| ALFRED | Historical vintages and revisions |
+| OECD | International economic statistics |
+| World Bank | Global development indicators |
+| IMF | International Financial Statistics |
+
+### Commercial Data Platforms
+
+| Provider         | Notes                                        |
+|:-----------------|:---------------------------------------------|
+| Bloomberg        | Extensive global macro database              |
+| LSEG / Refinitiv | Institutional data platform                  |
+| FactSet          | Integrated financial and macro data          |
+| Haver Analytics  | Industry standard for macroeconomic research |
+
+## Access Methods
+
+Common acquisition methods include:
+
+- Excel Add-ins
+- Website downloads (CSV)
+- REST APIs
+- R packages
+  - `fredr`
+  - `quantmod`
+  - `tidyquant`
+  - `pdfetch`
+- Python packages
+  - `fredapi`
+  - `pandas-datareader`
+
+## Data Challenges
+
+• Mixed frequencies • Publication lags • Revisions and benchmark revisions • Seasonal adjustment • Missing observations after merging series
+
+## Example Analyses
+
+Common analyses include:
+
+- GDP growth calculations
+- Inflation trend analysis
+- Yield curve construction
+- Labor market monitoring
+- Business cycle dating
+- Economic forecasting
+- Correlation with financial markets
+- Principal component analysis of macro variables
+- Recession prediction models
+
+# Data Acquisition Exercises
+
+We will focus on FRED.
+
+## Web Access
+
+Tasks:
+
+- Navigate to FRED website
+- Find the daily headline CPI index (not delta)
+- Download the data as a CSV for the entire history available
+- Load into R
+
+```{r}
+CPI_Web<-read.csv(here::here("?", "?"))
+tail(CPI_Web)
+```
+
+## API
+
+Architecture:
+
+- Sign up for FRED
+- Acquire API
+- Paste API into csv file in Supporting folder
+  - A2: ID
+  - B1: Key
+  - B2: paste your key
+- Load API key into R
+- Load the headline series into R using the API.
+
+Task: Load your API key
+
+```{r}
+fred_api_key <- ?(here::here("Supporting", "FREDKey.csv"))
+```
+
+Task: Establish the connection to FRED
+
+```{r}
+fredr_set_key(?y)
+```
+
+Task: Call CPI data, monthly from 1Jan1980 through 31Dec2025
+
+```{r}
+CPI_API<-fredr(
+  series_id = "?",
+  frequency = "?",
+  observation_start = as.Date("1980-01-01"),
+  observation_end = as.Date("2025-12-31"),
+  units = "?" 
+)
+```
+
+## Compare
+
+Task: Compare the 31Dec2025 value from the web to the API
+
+```{r}
+CPI_Web %>%
+  filter(?== "2025-12-01")
+
+CPI_API %>%
+  filter(? == as.Date("2025-12-01"))
+
+
+```
+
+# Revisions
+
+Q: What do realtime_start and realtime_end within the CPI_API object mean?
+
+A:
+
+?
+
+Task: Retrieve Nominal GDP (FRED CODE: GDPC1) by setting - observation_start to 2024-07-01 - observation_end to 2024-10-01 - vintage_dates to 2025-01-30
+
+```{r}
+
+GDP_Jan <- fredr(
+  series_id = "?",
+  observation_start = as.Date("2024-07-01"),
+  observation_end   = as.Date("2024-10-01"),
+  vintage_dates     = as.Date("2025-01-30")
+)
+```
+
+Task: Repeat but set vintage date to 2025-02-27
+
+```{r}
+GDP_Feb <- fredr(
+  series_id = "GDPC1",
+  observation_start = as.Date("2024-07-01"),
+  observation_end   = as.Date("2024-10-01"),
+  vintage_dates     = ?
+)
+```
+
+Task: Repeat but set vintage date to 2025-03-07
+
+```{r}
+GDP_Mar <- fredr(
+  series_id = "GDPC1",
+  observation_start = as.Date("2024-07-01"),
+  observation_end   = as.Date("2024-10-01"),
+  vintage_dates     = ?
+)
+```
+
+Task: Repeat but leave vintage date blank
+
+```{r}
+GDP_Today <- fredr(
+?
+)
+```
+
+Task: Create a tibble that combines date and values from each of the 4 iterations above.
+
+```{r}
+RevisionDemo <-
+    tibble(
+        Observation = GDP_Today$date,
+        VintageLateJan = GDP_Jan$value,
+        VintageLateFeb  = GDP_Feb$value,
+        VintageLateMar   = GDP_Mar$value,
+        Today   = GDP_Today$value
+    )
+
+RevisionDemo
+```
+
+Q: Why are some of the 2024-07-01 observations the same and others different? Why are all of the 2024-10-01 observations different?
+
+A:
+
+? \# Pull multiple series
+
+Goal: Pull multiple series from FRED using a single API call.
+
+Task: Establish a params list object containing the following parameters:
+
+- series_id = c("DGS10", "UNRATE")
+- frequency = c("m", "m")
+- observation_start = as.Date("1990-01-01")
+- observation_end = as.Date("2000-01-01")
+
+```{r}
+params <- list(
+  series_id = ?,
+  frequency = ?,
+  observation_start = as.Date("1990-01-01"),
+  observation_end = as.Date("2000-01-01")
+)
+```
+
+Task: Pull the data for both series using pmap_dfr() and store in a tibble called MultipleSeries.FREDR. Select only the date, series_id, and value columns.
+
+```{r}
+MultipleSeries.FREDR <- ?(
+  .l = list(params$series_id, params$frequency),
+  .f = ~ fredr(
+    series_id = ..1, 
+    frequency = ..2, 
+    observation_start = params$observation_start,
+    observation_end = params$observation_end
+  )
+)%>%
+  dplyr::select(?)
+```
