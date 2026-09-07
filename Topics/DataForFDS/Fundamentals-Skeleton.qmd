@@ -260,7 +260,7 @@ Structure
 - Navigate to Get Data -\> All Data -\> LSEG IBES -\> Summary History -\> Summary Statistics
 - Scroll to Step1
   - Change Date Variable to Forecast Period End Date
-  - Change dates to 2022-01 to 2025-12
+  - Change dates to 2025-01 to 2025-12
 - Scroll to Step2
   - Enter IBM as official ticker
   - Keep EPS
