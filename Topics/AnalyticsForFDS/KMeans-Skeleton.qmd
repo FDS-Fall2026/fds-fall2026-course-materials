@@ -1,5 +1,6 @@
 ---
-title: "K-Means for Financial Data Science"
+title: "K-Means"
+subtitle: "Machine Learning For Finance"
 author: Mike Aguilar
 format: html
 editor: visual
@@ -10,7 +11,6 @@ embed-resources: true
 execute:
   warning: false
   echo: true
-  enabled: false
 ---
 
 # Learning Objectives
@@ -21,7 +21,7 @@ By the end of this lesson, students should be able to:
 - Prepare a cross-sectional feature set for clustering, including checks for missing values, duplicate keys, unstable growth rates, scale differences, and influential observations.
 - Explain why feature selection, standardization, random starting values, and the choice of $K$ can change the resulting partition.
 - Use the elbow, gap-statistic, and silhouette approaches as complementary evidence when choosing $K$.
-- Interpret clusters economically and describe how a commercial bank might use—and validate—the resulting segmentation.
+- Interpret clusters economically and describe how an investor might use—and validate—the resulting segmentation.
 
 # Housekeeping
 
@@ -41,14 +41,18 @@ source(here("Supporting", "ProjectSetup.R"))
 
 # Background
 
-- You are a data scientist at a large commercial bank.
-- The bank lends to businesses in many industries.
-- The CEO wants to group industries with similar operating characteristics so that the bank can design lending policies, monitoring rules, and stress tests for economically similar groups.
-- We will use K-means as an unsupervised clustering algorithm. There is no target variable and no preassigned “correct” cluster for an industry.
+You are a data scientist at a large commercial bank.
+
+The bank lends to businesses in many industries.
+
+The CEO wants to group industries with similar operating characteristics so that the bank can design lending policies, monitoring rules, and stress tests for economically similar groups.
+
+We will use K-means as an unsupervised clustering algorithm. There is no target variable and no preassigned “correct” cluster for an industry.
 
 Q: What is the unit that we ultimately want to cluster?
 
-A: ?
+A:
+
 
 # Data
 
@@ -58,16 +62,14 @@ Task: Load the data dictionary from the `Data_Dictionary` sheet of `industry_fun
 
 ```{r}
 data_dictionary <- readxl::read_excel(
-  here("Data", "industry_fundamentals.xlsx"),
+  here("Data", "?"),
   sheet = "?"
 )
 
 data_dictionary
 ```
 
-Q: Before analyzing the observations, how do you expect industries to group based on size, growth, and profitability?
-
-A: ?
+Task: Before analyzing the observations, how do you expect industries to group based on size, growth, and profitability?
 
 Task: Load the `Data` sheet and call the object `industry_fundamentals`.
 
@@ -87,7 +89,7 @@ A clustering algorithm will return an answer even when the input has structural 
 Task: Display the fields in the dataset.
 
 ```{r}
-?(industry_fundamentals)
+names(industry_fundamentals)
 ```
 
 Task: Count rows, distinct industries, and distinct years.
@@ -96,14 +98,16 @@ Task: Count rows, distinct industries, and distinct years.
 industry_fundamentals %>%
   summarise(
     rows = ?,
-    industries = ?(Industry),
-    years = ?(Year)
+    industries = n_distinct(Industry),
+    years = n_distinct(Year)
   )
 ```
 
 Q: What is the unit of observation in the source data: industry, year, revenue, or something else?
 
-A:?
+A:
+
+
 
 Task: Verify that each industry-year key is unique.
 
@@ -140,7 +144,7 @@ Task: Count missing values by field
 ```{r}
 missing_by_field <- industry_fundamentals %>%
   summarise(across(everything(), ~ sum(is.na(.x)))) %>%
-  pivot_longer(
+  ?(
     cols = everything(),
     names_to = "field",
     values_to = "missing_values"
@@ -156,7 +160,7 @@ Task: Verify the accounting identity $\text{Profit}=\text{Revenue}-\text{Operati
 accounting_check <- industry_fundamentals %>%
   summarise(
     maximum_absolute_error = max(
-      abs(?),
+      abs(Profit - (Revenue - Operating_Cost)),
       na.rm = TRUE
     )
   )
@@ -166,7 +170,9 @@ accounting_check
 
 Q: Why does this identity matter for clustering?
 
-A: ?
+A:
+
+
 
 ## Engineering Growth Rates
 
@@ -216,7 +222,8 @@ stopifnot(
 
 Q: Why should Profit Growth be interpreted more cautiously than Revenue Growth or Cost Growth?
 
-A: ?
+A:
+
 
 ## Construct the Analysis Samples
 
@@ -234,16 +241,16 @@ year1 <- industry_fundamentals %>%
 
 year1_std_full <- year1 %>%
   mutate(
-    Revenue_z = z_score(Revenue),
-    Operating_Cost_z = z_score(Operating_Cost),
-    Profit_z = z_score(Profit)
+    Revenue_z = z_score(?),
+    Operating_Cost_z = z_score(?),
+    Profit_z = z_score(?)
   )
 
 growth_rates_std_full <- growth_rates %>%
   mutate(
-    Revenue_Growth_z = z_score(Revenue_Growth),
-    Cost_Growth_z = z_score(Cost_Growth),
-    Profit_Growth_z = z_score(Profit_Growth)
+    Revenue_Growth_z = z_score(?),
+    Cost_Growth_z = z_score(?),
+    Profit_Growth_z = z_score(?)
   )
 ```
 
@@ -257,7 +264,7 @@ Task: For Year 1, create side-by-side violin plots of Revenue, Operating Cost, a
 
 ```{r}
 year1_long <- year1 %>%
-  ?(
+  pivot_longer(
     cols = c(Revenue, Operating_Cost, Profit),
     names_to = "metric",
     values_to = "value"
@@ -279,7 +286,7 @@ Task: Create side-by-side violin plots of Revenue Growth, Cost Growth, and Profi
 ```{r}
 growth_long <- growth_rates %>%
   pivot_longer(
-    cols = ?,
+    cols = c(Revenue_Growth, Cost_Growth, Profit_Growth),
     names_to = "metric",
     values_to = "value"
   )
@@ -330,21 +337,23 @@ Task: Inspect the complete records for the two influential industries identified
 
 ```{r}
 year1 %>%
-  filter(Industry == "Industry32")
+  ?(Industry == "Industry32")
 
 growth_rates %>%
-  filter(Industry == "Industry07")
+  ?(Industry == "Industry07")
 ```
 
 Q: What do the plots and diagnostic tables suggest? Are we looking at one outlier or more than one?
 
-A: ?
+A:
+
+
 
 Task: Build a levels sample excluding `Industry32` and a growth-rate sample excluding `Industry07`. Re-standardize within each trimmed sample.
 
 ```{r}
 year1_trim <- year1 %>%
-  filter(Industry ? "Industry32") %>%
+  filter(Industry ?) %>%
   mutate(
     Revenue_z = z_score(Revenue),
     Operating_Cost_z = z_score(Operating_Cost),
@@ -352,7 +361,7 @@ year1_trim <- year1 %>%
   )
 
 growth_rates_trim <- growth_rates %>%
-  filter(Industry != "Industry07") %>%
+  filter(Industry ?) %>%
   mutate(
     Revenue_Growth_z = z_score(Revenue_Growth),
     Cost_Growth_z = z_score(Cost_Growth),
@@ -399,19 +408,19 @@ Task: Compute and visualize correlations using all industries.
 
 ```{r}
 growth_cor_full <- growth_rates %>%
-  ?(Revenue_Growth, Cost_Growth, Profit_Growth) %>%
+  select(Revenue_Growth, Cost_Growth, Profit_Growth) %>%
   ?(use = "complete.obs")
 
 growth_cor_full
-plot_correlation(growth_cor_full, "Growth-Rate Correlations: All Industries")
+?(growth_cor_full, "Growth-Rate Correlations: All Industries")
 ```
 
 Task: Recompute and visualize the correlations after excluding `Industry07`.
 
 ```{r}
 growth_cor_trim <- growth_rates_trim %>%
-  select(Revenue_Growth, Cost_Growth, Profit_Growth) %>%
-  ?(use = "complete.obs")
+  ?(Revenue_Growth, Cost_Growth, Profit_Growth) %>%
+  cor(use = "complete.obs")
 
 growth_cor_trim
 plot_correlation(growth_cor_trim, "Growth-Rate Correlations: Industry07 Excluded")
@@ -421,7 +430,6 @@ Q: How does removing `Industry07` change the correlation structure?
 
 A:
 
-?
 
 # K-Means
 
@@ -431,11 +439,11 @@ Q: How does K-means cluster observations?
 
 A:
 
-?
 
 Q: Does K-means cluster observations or variables?
 
-A: ?
+A:
+
 
 ## A Basic Fit
 
@@ -448,7 +456,11 @@ basic_features <- growth_rates_trim %>%
   select(Revenue_Growth, Cost_Growth)
 
 set.seed(1234)
-basic_kmeans <- ?
+basic_kmeans <- ?(
+  basic_features,
+  centers = ?,
+  nstart = 1
+)
 ```
 
 Task: Display each industry with its assigned cluster.
@@ -464,7 +476,9 @@ basic_assignments
 
 Q: How should the cluster vector be interpreted?
 
-A: ?
+A:
+
+
 
 Task: Display the cluster centroids.
 
@@ -479,7 +493,9 @@ basic_centers
 
 Q: How should the centroids be interpreted?
 
-A: E?
+A:
+
+
 
 ## The K-Means Objective and R Output
 
@@ -502,6 +518,8 @@ $$
 \left\|\mathbf{x}_i-\bar{\mathbf{x}}\right\|^2.
 $$
 
+This measures total dispersion around the overall mean before using the cluster assignments.
+
 ### Within-Cluster Sum of Squares: `withinss`
 
 For cluster $k$,
@@ -513,6 +531,8 @@ $$
 \left\|\mathbf{x}_i-\boldsymbol{\mu}_k\right\|^2.
 $$
 
+This measures the total squared distance of the observations in cluster $k$ from that cluster’s centroid.
+
 ### Total Within-Cluster Sum of Squares: `tot.withinss`
 
 $$
@@ -520,6 +540,8 @@ $$
 =
 \sum_{k=1}^{K}\mathrm{WithinSS}_k.
 $$
+
+This is the objective that K-means attempts to minimize.
 
 ### Between-Cluster Sum of Squares: `betweenss`
 
@@ -530,6 +552,8 @@ $$
  n_k
 \left\|\boldsymbol{\mu}_k-\bar{\mathbf{x}}\right\|^2.
 $$
+
+This measures how far the cluster centroids are from the overall mean, weighted by cluster size.
 
 The decomposition is
 
@@ -547,9 +571,9 @@ Task: Display the fit statistics and verify the decomposition.
 
 ```{r}
 basic_fit_statistics <- tibble(
-  totss = ?
-  tot_withinss = ?
-  betweenss = ?
+  totss = basic_kmeans$?,
+  tot_withinss = basic_kmeans$tot.withinss,
+  betweenss = basic_kmeans$betweenss,
   decomposition_error = basic_kmeans$totss -
     basic_kmeans$tot.withinss -
     basic_kmeans$betweenss,
@@ -564,8 +588,8 @@ Task: Compare cluster size, `withinss`, and `withinss` per observation.
 ```{r}
 basic_cluster_statistics <- tibble(
   cluster = seq_along(basic_kmeans$size),
-  size = basic_kmeans$?,
-  withinss = basic_kmeans$?,
+  size = basic_kmeans$size,
+  withinss = basic_kmeans$withinss,
   withinss_per_observation = basic_kmeans$withinss / basic_kmeans$size
 )
 
@@ -574,7 +598,9 @@ basic_cluster_statistics
 
 Q: Are these sums of squares best interpreted in relative or absolute terms?
 
-A: ?
+A:
+
+
 
 ## Random Initialization and `set.seed()`
 
@@ -594,7 +620,7 @@ c(
   run_2_tot_withinss = km_random_2$tot.withinss
 )
 
-mclust::?(
+mclust::adjustedRandIndex(
   km_random_1$cluster,
   km_random_2$cluster
 )
@@ -602,16 +628,18 @@ mclust::?(
 
 Q: Why might the two results differ even though the model specification did not change?
 
-A: ?
+A:
+
+
 
 Task: Reset to the same seed before each run and verify exact reproducibility.
 
 ```{r}
 set.seed(1234)
-km_seed_1 <- ?
+km_seed_1 <- kmeans(basic_features, centers = 3, nstart = 1)
 
 set.seed(1234)
-km_seed_2 <- ?
+km_seed_2 <- kmeans(basic_features, centers = 3, nstart = 1)
 
 identical(km_seed_1$cluster, km_seed_2$cluster)
 identical(km_seed_1$centers, km_seed_2$centers)
@@ -619,13 +647,17 @@ identical(km_seed_1$centers, km_seed_2$centers)
 
 Q: What does `set.seed()` accomplish?
 
-A: ?
+A:
 
 # Why Feature Redundancy Matters
 
+This section is a self-contained pedagogical demonstration built on the **Year 1 levels** (Revenue, Operating Cost, and Profit). Its purpose is to show that adding a redundant, exactly-determined feature can still change a K-means partition by reweighting the distance geometry. The three-variable levels specification used here is **not** the specification used for the main clustering analysis; the main analysis clusters industries on two growth features only (standardized Revenue Growth and Cost Growth), as set up in the "Altering the Number of Clusters" section below.
+
 Q: Suppose we cluster standardized Year 1 Revenue and Operating Cost. What do you expect to happen if standardized Profit is added?
 
-A: ?
+A:
+
+
 
 Task: Verify the accounting identity in the trimmed Year 1 sample.
 
@@ -633,7 +665,7 @@ Task: Verify the accounting identity in the trimmed Year 1 sample.
 year1_trim %>%
   summarise(
     maximum_absolute_error = max(
-      abs(Profit - (?))
+      abs(Profit - ?)
     )
   )
 ```
@@ -642,14 +674,22 @@ Task: Fit $K=2$ using standardized Revenue and Operating Cost.
 
 ```{r}
 set.seed(1234)
-km_2feat <- ?
+km_2feat <- kmeans(
+  year1_trim %>% select(Revenue_z, Operating_Cost_z),
+  ? = 2,
+  nstart = 20
+)
 ```
 
 Task: Fit $K=2$ using standardized Revenue, Operating Cost, and Profit.
 
 ```{r}
 set.seed(1234)
-km_all3 <- ?
+km_all3 <- kmeans(
+  year1_trim %>% select(?),
+  centers = 2,
+  nstart = 20
+)
 ```
 
 Task: Compute cluster profiles for both specifications.
@@ -727,11 +767,26 @@ feature_ari
 
 Q: How much did cluster membership change after Profit was added?
 
-A: ?
+A:
+
+
 
 Q: If Profit adds no new independent information, why can it change the clusters?
 
-A: ?
+A:
+
+
+$$
+d^2
+=
+(\Delta z_{Revenue})^2
++
+(\Delta z_{Cost})^2
++
+(\Delta z_{Profit})^2,
+$$
+
+whereas the two-feature objective omits the final term. The data still lie on a two-dimensional accounting plane, but distances along directions associated with Profit receive additional weight. A borderline observation can therefore move to another nearest centroid.
 
 # Why Standardization Matters
 
@@ -743,15 +798,15 @@ Task: Compare $K=2$ fits for raw and standardized Year 1 levels.
 
 ```{r}
 set.seed(4821)
-km_raw_levels <- kmeans(
-  year1_trim %>% select(Revenue, Operating_Cost),
+km_raw_levels <- ?(
+  year1_trim %>% ?(Revenue, Operating_Cost),
   centers = 2,
   nstart = 20
 )
 
 set.seed(4821)
-km_std_levels <- kmeans(
-  year1_trim %>% ?,
+km_std_levels <- ?(
+  year1_trim %>% ?(Revenue_z, Operating_Cost_z),
   centers = 2,
   nstart = 20
 )
@@ -761,8 +816,8 @@ Task: Compare $K=2$ fits for raw and standardized growth rates.
 
 ```{r}
 set.seed(4821)
-km_raw_growth <- ?(
-  growth_rates_trim %>% ?,
+km_raw_growth <- kmeans(
+  growth_rates_trim %>% select(Revenue_Growth, Cost_Growth),
   centers = ?,
   nstart = 20
 )
@@ -770,7 +825,7 @@ km_raw_growth <- ?(
 set.seed(4821)
 km_std_growth <- kmeans(
   growth_rates_trim %>% select(Revenue_Growth_z, Cost_Growth_z),
-  centers = 2,
+  centers = ?,
   nstart = 20
 )
 ```
@@ -815,7 +870,9 @@ feature_scale_summary
 
 Q: Did standardization materially change these particular two-feature partitions?
 
-A: ?
+A:
+
+
 
 ## Mixed Units
 
@@ -849,7 +906,7 @@ km_mixed_std <- kmeans(
   nstart = 20
 )
 
-mixed_scale_ari <- mclust::?(
+mixed_scale_ari <- mclust::adjustedRandIndex(
   km_mixed_raw$cluster,
   km_mixed_std$cluster
 )
@@ -889,51 +946,40 @@ mixed_scale_features %>%
 
 Q: Why is standardization more consequential in the mixed-unit example?
 
-A: ?
+A:
+
 
 # Altering the Number of Clusters
 
-We now return to the trimmed, standardized three-feature growth sample.
+We now return to the trimmed, standardized growth sample. From this point forward, the main clustering analysis uses **exactly two features**: standardized Revenue Growth and standardized Cost Growth. Profit Growth is deliberately excluded—it carries no independent accounting information beyond Revenue and Operating Cost, and its percentage-growth form is unstable when the initial profit base is small. The feature matrix is therefore genuinely two-dimensional, and we name it `X_growth_2feat` to make its composition explicit.
 
 ```{r}
 growth_features <- growth_rates_trim %>%
-  select(Industry, Revenue_Growth_z, Cost_Growth_z, Profit_Growth_z)
+  select(Industry, Revenue_Growth_z, Cost_Growth_z)
 
-X_growth <- growth_features %>%
+X_growth_2feat <- growth_features %>%
   select(-Industry) %>%
   as.matrix()
 
 fit_kmeans <- function(k, seed = 4821, nstart = 20) {
   set.seed(seed)
-  kmeans(X_growth, centers = k, nstart = nstart)
+  kmeans(X_growth_2feat, centers = k, nstart = nstart)
 }
 
-pairwise_scatter <- function(fit) {
+growth_scatter <- function(fit) {
   plot_data <- growth_features %>%
     mutate(cluster = factor(fit$cluster))
 
-  p1 <- ggplot(
+  ggplot(
     plot_data,
     aes(Revenue_Growth_z, Cost_Growth_z, color = cluster)
   ) +
     geom_point(size = 2) +
-    labs(color = "Cluster")
-
-  p2 <- ggplot(
-    plot_data,
-    aes(Revenue_Growth_z, Profit_Growth_z, color = cluster)
-  ) +
-    geom_point(size = 2) +
-    labs(color = "Cluster")
-
-  p3 <- ggplot(
-    plot_data,
-    aes(Cost_Growth_z, Profit_Growth_z, color = cluster)
-  ) +
-    geom_point(size = 2) +
-    labs(color = "Cluster")
-
-  patchwork::wrap_plots(p1, p2, p3, nrow = 1)
+    labs(
+      x = "Revenue Growth (z)",
+      y = "Cost Growth (z)",
+      color = "Cluster"
+    )
 }
 
 cluster_profile <- function(fit) {
@@ -941,7 +987,7 @@ cluster_profile <- function(fit) {
     mutate(cluster = fit$cluster) %>%
     group_by(cluster) %>%
     summarise(
-      across(c(Revenue_Growth, Cost_Growth, Profit_Growth), mean),
+      across(c(Revenue_Growth, Cost_Growth), mean),
       n = n(),
       .groups = "drop"
     ) %>%
@@ -954,8 +1000,8 @@ cluster_profile <- function(fit) {
 Task: Fit and visualize one cluster.
 
 ```{r}
-km_k1 <- ?
-pairwise_scatter(km_k1)
+km_k1 <- fit_kmeans(?)
+growth_scatter(km_k1)
 cluster_profile(km_k1)
 ```
 
@@ -964,8 +1010,8 @@ cluster_profile(km_k1)
 Task: Repeat for two clusters.
 
 ```{r}
-km_k2 <- ?
-pairwise_scatter(km_k2)
+km_k2 <- fit_kmeans(?)
+growth_scatter(km_k2)
 cluster_profile(km_k2)
 ```
 
@@ -974,8 +1020,8 @@ cluster_profile(km_k2)
 Task: Repeat for three clusters.
 
 ```{r}
-km_k3 <- ?
-pairwise_scatter(km_k3)
+km_k3 <- fit_kmeans(?)
+growth_scatter(km_k3)
 cluster_profile(km_k3)
 ```
 
@@ -984,8 +1030,8 @@ cluster_profile(km_k3)
 Task: Repeat for four clusters.
 
 ```{r}
-km_k4 <- ?
-pairwise_scatter(km_k4)
+km_k4 <- fit_kmeans(?)
+growth_scatter(km_k4)
 cluster_profile(km_k4)
 ```
 
@@ -1021,7 +1067,9 @@ tracked_industries
 
 Q: What happens as $K$ increases?
 
-A: ?
+A:
+
+
 
 # Choosing $K$
 
@@ -1039,7 +1087,7 @@ wss <- purrr::map_dbl(1:10, function(k) {
 })
 
 elbow_df <- tibble(
-  k = ?,
+  k = 1:10,
   wss = wss
 ) %>%
   mutate(
@@ -1062,7 +1110,9 @@ ggplot(elbow_df, aes(k, wss)) +
 
 Q: How many clusters does the elbow plot suggest?
 
-A: ?
+A:
+
+
 
 ## Gap Statistic
 
@@ -1076,8 +1126,8 @@ Task: Construct a gap-statistic plot for $K=1,\ldots,10$.
 
 ```{r}
 set.seed(4821)
-gap_stat <- cluster::?(
-  X_growth,
+gap_stat <- cluster::clusGap(
+  X_growth_2feat,
   FUNcluster = function(x, k) {
     kmeans(x, centers = k, nstart = 20)
   },
@@ -1099,7 +1149,7 @@ gap_k <- cluster::maxSE(
 
 gap_df
 
-ggplot(gap_df, aes(k, gap)) +
+ggplot(gap_df, aes(?)) +
   geom_line() +
   geom_point() +
   geom_errorbar(
@@ -1118,7 +1168,8 @@ gap_k
 
 Q: How many clusters does the gap statistic suggest?
 
-A: ?
+A:
+
 
 ## Silhouette Width
 
@@ -1127,7 +1178,7 @@ For each observation, silhouette width compares cohesion with its assigned clust
 Task: Compute average silhouette width for $K=2,\ldots,10$.
 
 ```{r}
-growth_distance <- dist(X_growth)
+growth_distance <- dist(X_growth_2feat)
 
 silhouette_scores <- purrr::map_dfr(2:10, function(k) {
   fit <- fit_kmeans(k, seed = 4821, nstart = 20)
@@ -1140,7 +1191,7 @@ silhouette_scores <- purrr::map_dfr(2:10, function(k) {
 })
 
 silhouette_k <- silhouette_scores %>%
-  ?(average_silhouette_width, n = 1, with_ties = FALSE) %>%
+  slice_max(average_silhouette_width, n = 1, with_ties = FALSE) %>%
   pull(k)
 
 silhouette_scores
@@ -1165,7 +1216,7 @@ Task: Inspect the detailed silhouette plot for the best-scoring $K$.
 
 ```{r}
 km_silhouette_best <- fit_kmeans(
-  ?,
+  silhouette_k,
   seed = 4821,
   nstart = 20
 )
@@ -1183,41 +1234,45 @@ plot(
 
 Q: Which cluster appears most internally coherent and well separated from the other clusters?
 
-A: ?
+A:
+
+
 
 Q: Which cluster appears least clearly separated?
 
-A: ?
+A:
 
-Task: Fit K=4, inspect its silhouette plot.
+
+
+Task: Fit K=3, inspect its silhouette plot.
 
 ```{r}
-km_silhouette_best <- fit_kmeans(
-  ?,
+km_silhouette_alt <- fit_kmeans(
+  3,
   seed = 4821,
   nstart = 20
 )
 
-silhouette_best <- cluster::?(
-  km_silhouette_best$cluster,
+silhouette_alt <- cluster::silhouette(
+  km_silhouette_alt$cluster,
   growth_distance
 )
 
 plot(
-  silhouette_best,
-  main = paste("Silhouette Plot, K =", 4)
+  silhouette_alt,
+  main = paste("Silhouette Plot, K =", 3)
 )
 
-km_3 <- fit_kmeans(3, seed = 4821, nstart = 20)
-km_4 <- fit_kmeans(4, seed = 4821, nstart = 20)
+km_2 <- ?(?, seed = 4821, nstart = 20)
+km_3 <- ?(?, seed = 4821, nstart = 20)
 ```
 
-Task: Create a cross-tabulation of the K=3 and K=4 assignments to determine how the original clusters were divided.
+Task: Create a cross-tabulation of the K=2 and K=3 assignments to determine how the original clusters were divided.
 
 ```{r}
 table(
-  K3 = km_3$?,
-  K4 = km_4$?
+  K2 = km_2$cluster,
+  K3 = km_3$cluster
 )
 ```
 
@@ -1225,19 +1280,24 @@ Q: How read this cross tab? What's the implication?
 
 A:
 
-?
 
-Q: Does allowing K-means to form a fourth cluster improve the quality of the clustering?
 
-A: ?
+Q: Does allowing K-means to form a third cluster improve the quality of the clustering?
 
-Q: Why can tot.withinss improve when moving from K=3 to K=4, while average silhouette width gets worse?
+A:
 
-A: ?
+
+
+Q: Why can tot.withinss improve when moving from K=2 to K=3, while average silhouette width gets worse?
+
+A:
+
 
 Q: How many clusters does the silhouette analysis suggest?
 
-A:?
+A:
+
+
 
 ## Synthesis
 
@@ -1247,7 +1307,7 @@ Task: Summarize the three diagnostics.
 selection_summary <- tibble(
   method = c("Elbow", "Gap statistic", "Silhouette"),
   suggested_k = c(
-    "2 or 3; visually ambiguous",
+    "2; pronounced first drop",
     as.character(gap_k),
     as.character(silhouette_k)
   )
@@ -1258,19 +1318,21 @@ selection_summary
 
 Q: How many clusters should we use?
 
-A: ?
+A:
+
+
 
 # Interpreting the Final Clusters
 
 Cluster numbers are arbitrary. Economic names are assigned after reviewing the cluster profiles.
 
 ```{r}
-chosen_k <- 3L
+chosen_k <- 2L
 
 set.seed(4821)
 km_final <- kmeans(
-  X_growth,
-  centers = ?,
+  X_growth_2feat,
+  centers = chosen_k,
   nstart = 20
 )
 
@@ -1282,7 +1344,6 @@ cluster_profiles <- growth_clustered %>%
   summarise(
     Revenue_Growth = mean(Revenue_Growth),
     Cost_Growth = mean(Cost_Growth),
-    Profit_Growth = mean(Profit_Growth),
     n = n(),
     .groups = "drop"
   ) %>%
@@ -1294,28 +1355,16 @@ flat_cluster <- cluster_profiles %>%
   slice_min(abs(average_operating_growth), n = 1, with_ties = FALSE) %>%
   pull(cluster)
 
-high_growth_clusters <- setdiff(cluster_profiles$cluster, flat_cluster)
-
-stronger_profit_cluster <- cluster_profiles %>%
-  filter(cluster %in% high_growth_clusters) %>%
-  slice_max(Profit_Growth, n = 1, with_ties = FALSE) %>%
-  pull(cluster)
-
-weaker_profit_cluster <- setdiff(
-  high_growth_clusters,
-  stronger_profit_cluster
-)
+high_growth_cluster <- setdiff(cluster_profiles$cluster, flat_cluster)
 
 cluster_name_map <- tibble(
   cluster = c(
     flat_cluster,
-    stronger_profit_cluster,
-    weaker_profit_cluster
+    high_growth_cluster
   ),
   cluster_name = c(
     "Mature / flat growth",
-    "High growth / stronger profit performance",
-    "High growth / weaker profit performance"
+    "High revenue and cost growth"
   )
 )
 
@@ -1331,13 +1380,12 @@ Task: Display cluster sizes and average growth rates.
 
 ```{r}
 cluster_profiles %>%
-  ?(
+  select(
     cluster,
     cluster_name,
     n,
     Revenue_Growth,
-    Cost_Growth,
-    Profit_Growth
+    Cost_Growth
   )
 ```
 
@@ -1349,7 +1397,7 @@ ggplot(
   aes(
     Revenue_Growth,
     Cost_Growth,
-    color = ?
+    color = cluster_name
   )
 ) +
   geom_point(size = 2) +
@@ -1361,7 +1409,7 @@ ggplot(
   )
 ```
 
-This is a two-dimensional view of a three-dimensional fit. Profit Growth still affects the assignments even though it is not displayed on the axes.
+Because the clustering uses exactly these two features, this scatter plot is a direct and complete visualization of the feature space the algorithm actually used—not a projection. Every distance that determined the cluster assignments is visible in this plane.
 
 Task: Compare Year 1 Revenue and Operating Cost while retaining the growth-based cluster colors.
 
@@ -1371,7 +1419,7 @@ level_view <- year1 %>%
   inner_join(
     growth_clustered %>%
       select(Industry, cluster, cluster_name),
-    by = "?"
+    by = "Industry"
   )
 
 ggplot(
@@ -1401,7 +1449,7 @@ growth_clustered %>%
 
 Q: What is the economic meaning of the final clusters?
 
-A: ?
+A:
 
 # Sensitivity and Stability
 
@@ -1412,15 +1460,15 @@ Task: Repeat the $K=2$ feature-redundancy comparison using the full, Year 1-stan
 ```{r}
 set.seed(4821)
 km_all3_full <- kmeans(
-  year1_std_full %>% select(?,?,?),
-  centers = ?,
+  ? %>% select(Revenue_z, Operating_Cost_z, Profit_z),
+  centers = 2,
   nstart = 20
 )
 
 set.seed(4821)
 km_2feat_full <- kmeans(
-  year1_std_full %>% select(?,?),
-  centers = ?,
+  year1_std_full %>% select(Revenue_z, Operating_Cost_z),
+  centers = 2,
   nstart = 20
 )
 
@@ -1450,34 +1498,34 @@ Q: What changes once `Industry32` is added back?
 
 A:
 
-?
+
 
 ## Outlier in Growth Rates: Add `Industry07` Back
 
-Task: Repeat the $K=3$ growth clustering with all industries and compare the common observations with the trimmed result.
+Task: Repeat the $K=2$ growth clustering with all industries and compare the common observations with the trimmed result.
 
 ```{r}
-X_growth_full <- growth_rates_std_full %>%
-  select(Revenue_Growth_z, Cost_Growth_z, Profit_Growth_z) %>%
+X_growth_2feat_full <- ? %>%
+  select(Revenue_Growth_z, Cost_Growth_z) %>%
   as.matrix()
 
 set.seed(4821)
-km_full_k3 <- ?(
-  ?,
-  centers = ?,
+km_full_k2 <- kmeans(
+  X_growth_2feat_full,
+  centers = chosen_k,
   nstart = 20
 )
 
 full_growth_assignments <- tibble(
   Industry = growth_rates_std_full$Industry,
-  cluster_full = km_full_k3$cluster
+  cluster_full = km_full_k2$cluster
 )
 
 full_growth_profiles <- growth_rates %>%
   left_join(full_growth_assignments, by = "Industry") %>%
   group_by(cluster_full) %>%
   summarise(
-    across(c(Revenue_Growth, Cost_Growth, Profit_Growth), mean),
+    across(c(Revenue_Growth, Cost_Growth), mean),
     n = n(),
     .groups = "drop"
   )
@@ -1505,11 +1553,10 @@ Q: What changes once `Industry07` is added back?
 
 A:
 
-?
 
-Q: How did adding the outlier affect the K=3 solution?
+Q: How did adding the outlier affect the K=2 solution?
 
-A: ?
+A:
 
 ## Starting Values and `nstart`
 
@@ -1519,13 +1566,13 @@ Task: Compare `nstart = 1` and `nstart = 20` across 50 random seeds.
 
 ```{r}
 initialization_results <- purrr::map_dfr(
-  c(?,?),
+  c(1L, 20L),
   function(number_of_starts) {
-    purrr::map_dfr(1:50, function(seed_value) {
+    purrr::map_dfr(?, function(seed_value) {
       set.seed(seed_value)
 
       fit <- kmeans(
-        X_growth,
+        X_growth_2feat,
         centers = chosen_k,
         nstart = number_of_starts
       )
@@ -1542,9 +1589,9 @@ initialization_results <- purrr::map_dfr(
 initialization_summary <- initialization_results %>%
   group_by(nstart) %>%
   summarise(
-    minimum_wss = ?(tot_withinss),
-    median_wss = ?(tot_withinss),
-    maximum_wss = ?(tot_withinss),
+    minimum_wss = min(tot_withinss),
+    median_wss = median(tot_withinss),
+    maximum_wss = max(tot_withinss),
     distinct_objective_values = n_distinct(round(tot_withinss, 6)),
     .groups = "drop"
   )
@@ -1578,10 +1625,12 @@ nstart_20_range <- initialization_summary %>%
 
 Q: What is the impact of `nstart` on the final result?
 
-A: ?
+A:
 
-# Implications for Financial Analysis
+
+
+# Implications for Investment Analysis
 
 Q: How could a commercial bank use these clusters?
 
-A: ?
+A:
