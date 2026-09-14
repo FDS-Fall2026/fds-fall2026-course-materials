@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="FinanceForFDS_files/libs/clipboard/clipboard.min.js"></script>
+<script src="FinanceForFDS_files/libs/quarto-html/tabby.min.js"></script>
+<script src="FinanceForFDS_files/libs/quarto-html/popper.min.js"></script>
+<script src="FinanceForFDS_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="FinanceForFDS_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="FinanceForFDS_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="FinanceForFDS_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <meta name="author" content="Mike Aguilar (mike.aguilar@duke.edu)">
+  <title>Finance Theory for Financial Data Science</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="FinanceForFDS_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="FinanceForFDS_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="FinanceForFDS_files/libs/revealjs/dist/theme/quarto-2740581606dc327e82f18f789b69d8a0.css">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="FinanceForFDS_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Finance Theory for Financial Data Science</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Mike Aguilar (mike.aguilar@duke.edu)
+</div>
+</div>
+</div>
+
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Table of contents</h2>
+<ul>
+<li class="fragment"><a href="#/intro" id="/toc-intro">Intro</a></li>
+<li class="fragment"><a href="#/performance-measurement" id="/toc-performance-measurement">Performance Measurement</a></li>
+<li class="fragment"><a href="#/modern-portfolio-theory" id="/toc-modern-portfolio-theory">Modern Portfolio Theory</a></li>
+<li class="fragment"><a href="#/asset-pricing" id="/toc-asset-pricing">Asset Pricing</a></li>
+<li class="fragment"><a href="#/corporate-fundamentals" id="/toc-corporate-fundamentals">Corporate Fundamentals</a></li>
+<li class="fragment"><a href="#/macro-drivers" id="/toc-macro-drivers">Macro Drivers</a></li>
+<li class="fragment"><a href="#/from-theory-to-financial-data-science" id="/toc-from-theory-to-financial-data-science">From Theory to Financial Data Science</a></li>
+</ul>
+</nav>
+</section>
+<section id="intro" class="title-slide slide level1 center">
+<h1>Intro</h1>
+<ul>
+<li class="fragment">In this deck, we will cover a few of the topics necessary to understand financial data science. This material is by no means exhaustive in its breadth or depth.</li>
+<li class="fragment">The expectation is that you have been exposed to most (all?) of this material. As such, this presentation is meant as a reminder as opposed to a first principles introduction.</li>
+<li class="fragment">We move from <strong>measuring</strong> returns and risk, to <strong>modern portfolio theory</strong>, to <strong>asset pricing</strong>, to <strong>corporate fundamentals</strong>, to <strong>macro drivers</strong>, which is roughly the order in which these concepts feed into the data science models later in the course.</li>
+</ul>
+</section>
+
+<section>
+<section id="performance-measurement" class="title-slide slide level1 center">
+<h1>Performance Measurement</h1>
+
+</section>
+<section id="measuring-returns" class="title-slide slide level2 center">
+<h2>Measuring Returns</h2>
+
+</section>
+<section id="returns-are-a-messy-concept" class="slide level3">
+<h3>Returns are a messy concept</h3>
+<p>The term “Return” is colloquially abused.</p>
+<ul>
+<li class="fragment">Net vs Gross</li>
+<li class="fragment">Simple vs Log</li>
+<li class="fragment">Realized vs Unrealized</li>
+<li class="fragment">Price vs Total</li>
+<li class="fragment">etc…</li>
+</ul>
+</section>
+<section id="simple-daily" class="slide level3">
+<h3>Simple (Daily)</h3>
+<p>Let’s assume <span class="math inline">\(t\)</span> is one day</p>
+<ul>
+<li class="fragment">1-Day Net Return (aka Holding Period Yield (HPY)): <span class="math inline">\(R_{t}=\frac{P_{t}-P_{t-1}}{P_{t-1}}=\frac{P_{t}}{P_{t-1}}-1\)</span></li>
+<li class="fragment">1-Day Gross Return (aka Holding Period Return (HPR)) <span class="math inline">\(1+R_{t}=\frac{P_{t}}{P_{t-1}}\)</span></li>
+</ul>
+</section>
+<section id="simple-multiperiod" class="slide level3">
+<h3>Simple (Multiperiod)</h3>
+<ul>
+<li class="fragment">2-Day Net: <span class="math inline">\(R_{t}(2)=\frac{P_{t}-P_{t-2}}{P_{t-2}}\)</span></li>
+<li class="fragment">H-Day Net: <span class="math inline">\(R_{t}(H)=\frac{P_{t}-P_{t-H}}{P_{t-H}}\)</span></li>
+<li class="fragment">H-Day Gross: <span class="math inline">\(1+R_{t}(H)=(1+R_{t-H+1})\cdots (1+R_{t-1})(1+R_{t})\)</span></li>
+<li class="fragment">H-Day Gross: <span class="math inline">\(1+R_{t}(H)=\prod_{j=0}^{H-1}(1+R_{t-j})\)</span></li>
+</ul>
+</section>
+<section id="simple-total-returns-stocks" class="slide level3">
+<h3>Simple Total Returns (Stocks)</h3>
+<p>Define <span class="math inline">\(P\)</span> as price and <span class="math inline">\(D\)</span> as dividend and consider <span class="math inline">\(R_{t} = \frac{P_{t}+D_{t}-P_{t-1}}{P_{t-1}}\)</span>.</p>
+<div class="fragment">
+<p>Q: Can you write the Simple Total Return and decompose into two values?</p>
+</div>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(1+R_{t} = \frac{P_{t}}{P_{t-1}} + \frac{D_{t}}{P_{t-1}}\)</span></li>
+<li class="fragment">Total Return = “Capital Gains Yield” + “Dividend Yield”</li>
+</ul>
+</div>
+</section>
+<section id="simple-total-returns-bonds" class="slide level3">
+<h3>Simple Total Returns (Bonds)</h3>
+<p>Define <span class="math inline">\(P\)</span> as the price and <span class="math inline">\(C\)</span> as the coupon. Assume purchased at par, such that <span class="math inline">\(P_{t-1}\)</span> equals the face value.</p>
+<div class="fragment">
+<p>Q: Can you write the Simple Total Return and decompose into two values?</p>
+</div>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(1+R_{t} = \frac{P_{t}}{P_{t-1}} + \frac{C_{t}}{P_{t-1}}\)</span></li>
+<li class="fragment">Total Return = “Capital Gains Yield” + “Coupon Rate”</li>
+</ul>
+</div>
+</section>
+<section id="simple-annualized-returns" class="slide level3">
+<h3>Simple Annualized Returns</h3>
+<p>Q: What is the meaning of “annualized” return?</p>
+<div class="fragment">
+<p>A: How much the return would be if continued for an entire year</p>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><span class="math inline">\(R_{t}(H)^{A} = (1+R_{t}(H))^{\frac{\# \text{of periods per year}}{H}}-1\)</span></li>
+<li class="fragment"><span class="math inline">\(R_{t}(H)^{A} = (\frac{P_{t}}{P_{t-1}})^{\frac{\# \text{of periods per year}}{H}}-1\)</span></li>
+</ul>
+</div>
+</section>
+<section id="simple-real-returns" class="slide level3">
+<h3>Simple Real Returns</h3>
+<p>Q: What does “Real” mean? Why use?</p>
+<div class="fragment">
+<p>A:“Real” means inflation adjusted. Useful for computing growth of assets in terms of buying power.</p>
+</div>
+<div class="fragment">
+<p>Q: How compute real returns?</p>
+<ul>
+<li class="fragment"><span class="math inline">\(R_{t}^{Real}(H) = \frac{1+R_{t}(H)}{1+\pi_{t}(H)}-1\)</span></li>
+<li class="fragment">where <span class="math inline">\(\pi_{t}(H) = CPI_{t}/CPI_{t-H}-1\)</span></li>
+<li class="fragment">Note: CPI is widely used, broad measure of prices, but you could customize. e.g.&nbsp;Price index in your region of the country</li>
+<li class="fragment">Note: The horizon for inflation should match the horizon for returns</li>
+</ul>
+</div>
+</section>
+<section id="shortcoming-of-simple-returns" class="slide level3">
+<h3>Shortcoming of Simple Returns</h3>
+<ul>
+<li class="fragment">Simple Returns are not additive
+<ul>
+<li class="fragment">returns on monday + tuesday + … + friday does not equal the week’s return</li>
+</ul></li>
+<li class="fragment">Simple Returns are not symmetric
+<ul>
+<li class="fragment">$100 grown 20% is 120. But 120 shrunk by 20% is 96.</li>
+</ul></li>
+<li class="fragment">Our empirical models (e.g.&nbsp;regression) work better with additivity and symmetry</li>
+<li class="fragment">Log returns are a common solution
+<ul>
+<li class="fragment">Sum of daily log returns is weekly log return</li>
+<li class="fragment">$100 grown log return 20% and then shrunk 20% brings you back to $100</li>
+</ul></li>
+</ul>
+</section>
+<section id="from-simple-to-log-returns" class="slide level3">
+<h3>From Simple to Log Returns</h3>
+<p>Let’s focus on daily returns</p>
+<ul>
+<li class="fragment"><span class="math inline">\(r_{t}=ln(1+R_{t})=ln(P_{t}/P_{t-1}) = ln(P_{t})-ln(P_{t-1})\)</span></li>
+<li class="fragment"><span class="math inline">\(e^{r_{t}}-1=R_{t}\)</span></li>
+</ul>
+</section>
+<section id="multiperiod-log-returns" class="slide level3">
+<h3>MultiPeriod Log Returns</h3>
+<ul>
+<li class="fragment"><span class="math inline">\(r_{t}(2) = ln(1+R_{t}(2))=ln(P_{t}/P_{t-2})\)</span></li>
+<li class="fragment"><span class="math inline">\(r_{t}(2) = ln(\frac{P_{t}}{P_{t-1}}\frac{P_{t-1}}{P_{t-2}})\)</span></li>
+<li class="fragment"><span class="math inline">\(r_{t}(2) = ln(\frac{P_{t}}{P_{t-1}}) + ln(\frac{P_{t-1}}{P_{t-2}})\)</span></li>
+<li class="fragment"><span class="math inline">\(r_{t}(2) = r_{t} + r_{t-1}\)</span></li>
+</ul>
+<div class="fragment">
+<p>More generally,</p>
+<p><span class="math inline">\(r_{t}(H) = \sum_{j=0}^{H-1}{r_{t-j}}\)</span></p>
+</div>
+</section>
+<section id="annualized-log-returns" class="slide level3">
+<h3>Annualized Log Returns</h3>
+<p><span class="math inline">\(r_{t}(H)^{A} = (\frac{\text{periods per year}}{H})\times r_{t}(H)\)</span></p>
+</section>
+<section id="real-log-returns" class="slide level3">
+<h3>Real Log Returns</h3>
+<ul>
+<li class="fragment"><span class="math inline">\(r_{t}^{Real} = r_{t}-\pi_{t}^{C}\)</span></li>
+<li class="fragment">where <span class="math inline">\(\pi^{C}_{t} = ln(1+\pi_{t})\)</span></li>
+</ul>
+</section>
+<section id="simple-or-log" class="slide level3">
+<h3>Simple or Log?</h3>
+<ul>
+<li class="fragment">Simple returns are used for performance reporting</li>
+<li class="fragment">Log returns are used for statistical modeling</li>
+</ul>
+</section>
+
+<section id="measuring-risk" class="title-slide slide level2 center">
+<h2>Measuring Risk</h2>
+
+</section>
+<section id="risk-is-difficult-to-measure" class="slide level3">
+<h3>Risk is Difficult to Measure</h3>
+<p>Q: Why is risk so much more difficult to measure than returns?</p>
+<div class="fragment">
+<p>A: Returns are observed. Risk is not.</p>
+</div>
+<div class="fragment">
+<p>We will discuss the meaning of risk soon, but for now we proxy with variance and standard deviation.</p>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><span class="math inline">\(\sigma^{2}_{r_{t}}=\frac{1}{T}\sum_{t=1}^{T}{(r_{t}-\bar{r})^{2}}\)</span></li>
+<li class="fragment"><span class="math inline">\(\sigma_{r_{t}} = \sqrt{\sigma^{2}_{r_{t}}}\)</span></li>
+<li class="fragment">Both are commonly referred to as ``volatility”</li>
+</ul>
+</div>
+</section>
+<section id="symmetric-vs-asymmetric-risk-measures" class="slide level3">
+<h3>Symmetric vs Asymmetric Risk Measures</h3>
+<p>Q: Is treating upside and downside surprises the same always appropriate?</p>
+<div class="fragment">
+<p>A: Not necessarily.</p>
+<ul>
+<li class="fragment">Variance/standard deviation penalize upside and downside surprises equally</li>
+<li class="fragment">Investors typically only dislike the downside</li>
+<li class="fragment">Asymmetric alternatives: semi-variance, Value-at-Risk (VaR), Conditional VaR (Expected Shortfall)</li>
+<li class="fragment">We will build several of these as forecasting targets later in the course</li>
+</ul>
+</div>
+</section>
+
+<section id="risk-return-measures" class="title-slide slide level2 center">
+<h2>Risk / Return Measures</h2>
+
+</section>
+<section id="common-measures-of-the-riskreturn-tradeoff-sr" class="slide level3">
+<h3>Common Measures of the Risk/Return Tradeoff (SR)</h3>
+<div class="fragment">
+<p>Sharpe Ratio: <span class="math inline">\(SR = \frac{R-R^{f}}{\sigma}\)</span>, where <span class="math inline">\(R^{f}\)</span> is the risk free rate</p>
+</div>
+<div class="fragment">
+<p>Q: Meaning? Want high or low?</p>
+</div>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Return in excess of risk free per unit of risk</li>
+<li class="fragment">We want high</li>
+</ul>
+</div>
+</section>
+<section id="common-measures-of-the-riskreturn-tradeoff-tracking-error" class="slide level3">
+<h3>Common Measures of the Risk/Return Tradeoff (Tracking Error)</h3>
+<div class="fragment">
+<p>Tracking Error: <span class="math inline">\(\sqrt{\frac{1}{T-1}\sum_{t=1}^{T}(R^{p}_{t}-R^{B}_{t})^{2}}\)</span>, where <span class="math inline">\(R^{p}\)</span> is the portfolio return and <span class="math inline">\(R^{B}\)</span> is the benchmark return.</p>
+</div>
+<div class="fragment">
+<p>Q: Meaning? Want high or low?</p>
+</div>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Variability of portfolio return from benchmark</li>
+<li class="fragment">An index fund manager wants this low. An active fund manager might permit this to be higher in order to garner excess performance</li>
+</ul>
+</div>
+</section>
+<section id="other-common-measures" class="slide level3">
+<h3>Other Common Measures</h3>
+<p>Information Ratio: <span class="math inline">\(IR = \frac{R^{p}-R^{B}}{\text{Tracking Error}}\)</span></p>
+<div class="fragment">
+<ul>
+<li class="fragment">Excess return over benchmark per unit of active (benchmark-relative) risk</li>
+<li class="fragment">The Sharpe Ratio of “active” management</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Sortino Ratio: <span class="math inline">\(\frac{R - R^{f}}{\sqrt{\frac{1}{T}\sum_{t=1}^{T}\left[\min\!\left(0,\; R_t - R^{f}\right)\right]^2}}\)</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Like Sharpe Ratio, but rewards managers for upside volatility rather than penalizing it</li>
+</ul>
+</div>
+</section>
+
+<section id="portfolio-risk-and-return" class="title-slide slide level2 center">
+<h2>Portfolio Risk and Return</h2>
+
+</section>
+<section id="portfolio-return" class="slide level3">
+<h3>Portfolio Return</h3>
+<p>Q: What is the return of a portfolio composed of <span class="math inline">\(N\)</span> assets?</p>
+<div class="fragment">
+<p>A: <span class="math inline">\(R^{P}_{t} = \sum_{i=1}^{N}w_{i}R_{i,t+1}\)</span></p>
+</div>
+</section>
+<section id="portfolio-risk" class="slide level3">
+<h3>Portfolio Risk</h3>
+<p>Q: What is the variance of a portfolio composed of <span class="math inline">\(N\)</span> assets?</p>
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(\sigma^{2}_{P,t} = w'Sw\)</span></li>
+<li class="fragment">where <span class="math inline">\(w\)</span> is (Nx1)</li>
+<li class="fragment">and <span class="math inline">\(S\)</span> is an (NxN) covariance matrix</li>
+</ul>
+</section>
+<section id="portfolio-variance-n2" class="slide level3">
+<h3>Portfolio Variance (N=2)</h3>
+<p>Q: What is the variance of a portfolio of 2 assets?</p>
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(\sigma^{2} = w_{A}^{2}\sigma^{2}_{A} + w_{B}^{2}\sigma^{2}_{B}+2\rho_{A,B}w_{A}w_{B}\)</span></li>
+</ul>
+</section>
+<section id="portfolio-variance-n3" class="slide level3">
+<h3>Portfolio Variance (N=3)</h3>
+<p>Q: What is the variance of a portfolio of 3 assets?</p>
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(\sigma^{2} = w_{A}^{2}\sigma^{2}_{A} + w_{B}^{2}\sigma^{2}_{B}+w_{C}^{2}\sigma^{2}_{C}+2\rho_{A,B}w_{A}w_{B} + 2\rho_{A,C}w_{A}w_{C} + 2\rho_{B,C}w_{B}w_{C}\)</span></li>
+</ul>
+</section>
+<section id="curse-of-dimensionality" class="slide level3">
+<h3>Curse of Dimensionality</h3>
+<p>We will compute portfolio return and variance from historical data for peformance reporting. Moreover, we will construct these objects on a prospective basis for portfolio allocation. Let’s assume for now that the weights are known.</p>
+<p>Q: How many parameters do we need to estimate portfolio return of N assets?</p>
+<div class="fragment">
+<p>A: <span class="math inline">\(N\)</span> (expected) returns</p>
+</div>
+<div class="fragment">
+<p>Q: How many parameters do we need to estimate the portfolio variance of N assets?</p>
+</div>
+<div class="fragment">
+<p>A: <span class="math inline">\(N+ N(N-1)/2\)</span>. For a portfolio of 500 assets that is 125,250 parameters (500 variances and 124,750 unique pairwise covariances)</p>
+</div>
+</section>
+</section>
+<section>
+<section id="modern-portfolio-theory" class="title-slide slide level1 center">
+<h1>Modern Portfolio Theory</h1>
+
+</section>
+<section id="what-is-risk" class="slide level3">
+<h3>What Is Risk?</h3>
+<p>Q: What is risk, really?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Variance/standard deviation are convenient proxies, not definitions of risk</li>
+<li class="fragment">Risk is uncertainty about future outcomes that matter for wealth or wellbeing</li>
+<li class="fragment">Not all uncertainty is symmetric, or equally compensated by markets</li>
+</ul>
+</div>
+</section>
+<section id="systematic-vs-idiosyncratic-risk" class="slide level3">
+<h3>Systematic vs Idiosyncratic Risk</h3>
+<p>Q: Are all sources of risk equally important to a diversified investor?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Idiosyncratic (unsystematic) risk: firm or asset-specific, can be diversified away</li>
+<li class="fragment">Systematic (market) risk: common across assets, cannot be diversified away</li>
+<li class="fragment">Markets only compensate investors for bearing systematic risk</li>
+</ul>
+</div>
+</section>
+<section id="diversification" class="slide level3">
+<h3>Diversification</h3>
+<p>Q: Why does combining assets reduce risk?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Recall the N=2 portfolio variance formula: as long as <span class="math inline">\(\rho_{A,B}&lt;1\)</span>, portfolio std. dev. is less than the weighted average of the individual std. devs.</li>
+<li class="fragment">Diversification eliminates idiosyncratic risk; it cannot eliminate systematic risk</li>
+<li class="fragment">As <span class="math inline">\(N\rightarrow\infty\)</span>, portfolio variance converges to the average covariance across assets — the systematic risk “floor”</li>
+</ul>
+</div>
+</section>
+<section id="expected-utility-and-risk-aversion" class="slide level3">
+<h3>Expected Utility and Risk Aversion</h3>
+<p>Q: How do we formalize investor preferences over risky outcomes?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Expected utility: <span class="math inline">\(E[U(W)] = \sum_{s}p_{s}U(W_{s})\)</span></li>
+<li class="fragment">Risk aversion: concave utility, <span class="math inline">\(U''(W)&lt;0\)</span></li>
+<li class="fragment">Certainty equivalent: the certain payoff that delivers the same utility as the risky gamble</li>
+<li class="fragment">A risk-averse investor’s certainty equivalent is always below the gamble’s expected value</li>
+</ul>
+</div>
+</section>
+<section id="mean-variance-preferences" class="slide level3">
+<h3>Mean-Variance Preferences</h3>
+<p>Q: When can we summarize preferences using just mean and variance?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Quadratic utility, <strong>or</strong></li>
+<li class="fragment">Returns are jointly normal (or elliptically distributed)</li>
+<li class="fragment">Under either condition: <span class="math inline">\(U = E[R_{p}]-\frac{1}{2}\lambda\sigma^{2}_{p}\)</span>, where <span class="math inline">\(\lambda\)</span> is the investor’s risk-aversion coefficient</li>
+</ul>
+</div>
+</section>
+<section id="the-efficient-frontier" class="slide level3">
+<h3>The Efficient Frontier</h3>
+<p>Q: With many risky assets available, which portfolios are “best”?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Minimum-variance frontier: the lowest-variance portfolio achievable for each level of expected return</li>
+<li class="fragment">Efficient frontier: the upper portion of that frontier (highest return for each level of variance)</li>
+<li class="fragment">Rational, risk-averse investors only ever hold portfolios on the efficient frontier</li>
+</ul>
+</div>
+</section>
+<section id="adding-a-risk-free-asset" class="slide level3">
+<h3>Adding a Risk-Free Asset</h3>
+<p>Q: What changes once a risk-free asset is available?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Capital Allocation Line (CAL): straight line from <span class="math inline">\(R_{f}\)</span>, tangent to the risky-asset frontier</li>
+<li class="fragment">Tangency portfolio: the single risky portfolio touched by that line</li>
+<li class="fragment">Two-Fund Separation: every investor holds some mix of the risk-free asset and the <strong>same</strong> tangency portfolio; only the mix (leverage vs.&nbsp;safety) differs by investor</li>
+</ul>
+</div>
+</section>
+<section id="portfolio-optimization-in-practice" class="slide level3">
+<h3>Portfolio Optimization in Practice</h3>
+<p>Q: How do we solve for optimal weights?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Minimize <span class="math inline">\(w'Sw\)</span> subject to <span class="math inline">\(w'\mu=R^{target}\)</span> and <span class="math inline">\(w'\mathbf{1}=1\)</span></li>
+<li class="fragment">Solved via quadratic programming / Lagrangian methods</li>
+<li class="fragment">Inputs (<span class="math inline">\(\mu\)</span>, <span class="math inline">\(S\)</span>) are estimated with error — “optimization is error maximization” (Michaud)</li>
+<li class="fragment">Motivates shrinkage estimators, Black-Litterman, and robust optimization — themes we’ll revisit with ML tools later in the course</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="asset-pricing" class="title-slide slide level1 center">
+<h1>Asset Pricing</h1>
+
+</section>
+<section id="pricing-risk-free-assets" class="title-slide slide level2 center">
+<h2>Pricing Risk Free Assets</h2>
+
+</section>
+<section id="compounding" class="slide level3">
+<h3>Compounding</h3>
+<p>Q: How much is $100 grown at 5% per year for one year?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(100\times (1.05) = 105\)</span></li>
+<li class="fragment">This is known as compounding</li>
+<li class="fragment">$100: Present Value</li>
+<li class="fragment">$105: Future Value</li>
+<li class="fragment">5%: Compounding rate</li>
+<li class="fragment"><span class="math inline">\(FV = PV(1+R)\)</span></li>
+</ul>
+</div>
+</section>
+<section id="discounting" class="slide level3">
+<h3>Discounting</h3>
+<p>Q: How much is $105 promised (with certainty) in one year from now worth today?</p>
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(FV = PV(1+R)\)</span> <span class="math inline">\(\rightarrow\)</span> <span class="math inline">\(PV = FV/(1+R)\)</span></li>
+<li class="fragment">We know FV</li>
+<li class="fragment">Our goal is to find PV</li>
+<li class="fragment">But we don’t know R</li>
+<li class="fragment">R is known as the discount rate</li>
+<li class="fragment">The discount rate captures the opportunity cost (i.e.&nbsp;how much return you require to accept the investment)</li>
+<li class="fragment">If the investor’s next best option yielded 5%, then <span class="math inline">\(PV = 105/(1+.05) = 100\)</span></li>
+</ul>
+</section>
+<section id="coupon-bonds" class="slide level3">
+<h3>Coupon Bonds</h3>
+<p>Q: What is the formula for the PV of a 2yr semi annual coupon bond?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(PV = \frac{C}{1+R} + \frac{C}{(1+R)^{2}} + \frac{C}{(1+R)^{3}} + \frac{C+F}{(1+R)^{4}}\)</span></li>
+<li class="fragment">C: coupon ($)</li>
+<li class="fragment">F: face ($)</li>
+<li class="fragment">R: periodic discount rate (%)</li>
+<li class="fragment">C/F: Coupon Rate (%)</li>
+</ul>
+</div>
+</section>
+<section id="discount-bond" class="slide level3">
+<h3>Discount Bond</h3>
+<p>Q: What is the formula for the PV of a N-yr discount bond?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(PV = \frac{F}{(1+R)^{N}}\)</span></li>
+<li class="fragment">Discount Bonds don’t pay any coupons</li>
+<li class="fragment">F: face ($)</li>
+<li class="fragment">R: periodic discount rate (%)</li>
+<li class="fragment">N: number of periods</li>
+</ul>
+</div>
+</section>
+
+<section id="asset-market-equilibrium" class="title-slide slide level2 center">
+<h2>Asset Market Equilibrium</h2>
+
+</section>
+<section id="market-risk" class="slide level3">
+<h3>Market Risk</h3>
+<ul>
+<li class="fragment">Q: How use exposure to market fluctuations to determine if a stock is over/undervalued? (note: there are several approaches)</li>
+<li class="fragment">A: CAPM
+<ul>
+<li class="fragment">First pass: Get beta via time series regression <span class="math inline">\(r_{t}=a+\beta r^{M}_{t}+u_{t}\)</span>, where <span class="math inline">\(r_{t}\)</span> is the log excess return at time <span class="math inline">\(t\)</span>. Repeat for each stock <span class="math inline">\(i\)</span> and get <span class="math inline">\(\hat{\beta}_{i}\)</span></li>
+<li class="fragment">Second pass: Get lambda via cross section regression <span class="math inline">\(\bar{r}_{i}=\lambda_{0} + \lambda\hat{\beta}_{i}+e_{i}\)</span>, where <span class="math inline">\(r_{i}\)</span> is log excess return for asset <span class="math inline">\(i\)</span></li>
+<li class="fragment">Use for valuation (see below)</li>
+</ul></li>
+</ul>
+</section>
+<section id="interpreting-the-capm" class="slide level3">
+<h3>Interpreting the CAPM</h3>
+<p>Q: What do beta and lambda mean?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(\beta_{i} = \frac{Cov(r_{i},r_{m})}{Var(r_{m})}\)</span>: sensitivity of asset <span class="math inline">\(i\)</span> to market moves (exposure to market risk)</li>
+<li class="fragment"><span class="math inline">\(\lambda\)</span>: market price of risk (market risk premium)</li>
+</ul>
+</div>
+</section>
+<section id="the-security-market-line" class="slide level3">
+<h3>The Security Market Line</h3>
+<p>Q: How do we use CAPM to judge if a stock is over- or under-valued?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Security Market Line (SML): y-axis: return vs x-axis: beta</li>
+<li class="fragment">Points of the line dictated by CAPM second pass regression. Slope is the <span class="math inline">\(\lambda\)</span>, which for the CAPM is the <span class="math inline">\(E[r_{m}-r_{f}]\)</span></li>
+<li class="fragment">Plot your subjective expected return. If your subjective expectued return is above the SML, <span class="math inline">\(\alpha_{i}=E[r^{subjective}]-E[r^{capm}]&gt;0\)</span>; then you believe the stock is <em>undervalued</em> (your expectation is greater than what’s priced into the market visa vis CAPM)</li>
+<li class="fragment">If your subjective expected return is below the SML, <span class="math inline">\(\alpha_{i}=E[r^{subjective}]-E[r^{capm}]&lt;0\)</span>;then you believe the stock is <em>overvalued</em> (your expectation is less than what’s priced into the market visa vis CAPM)</li>
+</ul>
+</div>
+</section>
+<section id="factor-risk" class="slide level3">
+<h3>Factor Risk</h3>
+<p>Q: What if a single market factor doesn’t fully explain returns?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Arbitrage Pricing Theory (APT): returns driven by multiple systematic factors</li>
+<li class="fragment"><span class="math inline">\(R_{i} = \alpha_{i}+\beta_{i,1}F_{1}+\beta_{i,2}F_{2}+\cdots+\beta_{i,K}F_{K}+\epsilon_{i}\)</span></li>
+<li class="fragment">Fama-French 3-Factor: Market, SMB (size), HML (value)</li>
+<li class="fragment">Fama-French 5-Factor adds RMW (profitability), CMA (investment)</li>
+<li class="fragment">Momentum (UMD) often added as a 6th factor</li>
+<li class="fragment">Factor models double as risk-attribution tools <strong>and</strong> as feature sets for return-prediction models</li>
+</ul>
+</div>
+</section>
+
+<section id="fixed-income" class="title-slide slide level2 center">
+<h2>Fixed Income</h2>
+
+</section>
+<section id="duration" class="slide level3">
+<h3>Duration</h3>
+<p>Q: How do we measure a bond’s sensitivity to interest rate changes?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Macaulay Duration: <span class="math inline">\(D = \frac{\sum_{t=1}^{T}t\cdot\frac{CF_{t}}{(1+R)^{t}}}{PV}\)</span> — the PV-weighted average time to receive cash flows</li>
+<li class="fragment">Modified Duration: <span class="math inline">\(D_{mod} = \frac{D}{1+R}\)</span></li>
+<li class="fragment">Price sensitivity approximation: <span class="math inline">\(\frac{\Delta P}{P}\approx -D_{mod}\times\Delta R\)</span></li>
+<li class="fragment">Convexity captures the curvature the linear duration approximation misses</li>
+</ul>
+</div>
+</section>
+<section id="duration-matching" class="slide level3">
+<h3>Duration Matching</h3>
+<p>Q: Why do risk managers care about duration?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Immunization: match asset duration to liability duration so a rate move affects both similarly</li>
+<li class="fragment">Longer maturity or lower coupon <span class="math inline">\(\rightarrow\)</span> higher duration; higher coupon <span class="math inline">\(\rightarrow\)</span> lower duration</li>
+<li class="fragment">Zero-coupon (discount) bonds have duration equal to maturity — the maximum duration for a given maturity</li>
+</ul>
+</div>
+</section>
+<section id="yield-curve" class="slide level3">
+<h3>Yield Curve</h3>
+<p>Q: Why is the yield curve typically upward sloping?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Expectations: if future short rates are expected to rise, long yields exceed short yields</li>
+<li class="fragment">Term/liquidity premium: investors demand compensation for locking up money longer and bearing more rate risk</li>
+<li class="fragment">Normal growth expectations + term premium <span class="math inline">\(\rightarrow\)</span> upward slope, on average</li>
+</ul>
+</div>
+</section>
+<section id="reading-the-curve" class="slide level3">
+<h3>Reading the Curve</h3>
+<p>Q: What does the shape imply?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Steep curve: often associated with expectations of stronger growth/inflation</li>
+<li class="fragment">Flat curve: uncertainty or a policy transition</li>
+<li class="fragment">Inverted curve (short &gt; long): historically watched as a signal of rising recession risk, since it implies the market expects future rate cuts (weaker growth ahead)</li>
+<li class="fragment">Caveat: the curve reflects expectations, term premia, <strong>and</strong> central bank policy simultaneously — no single indicator is perfect</li>
+</ul>
+</div>
+</section>
+
+<section id="equity" class="title-slide slide level2 center">
+<h2>Equity</h2>
+
+</section>
+<section id="dividend-discount-model" class="slide level3">
+<h3>Dividend Discount Model</h3>
+<p>Q: What is a stock worth?</p>
+<div class="fragment">
+<p>A: Discounted value of future stream of cash flows, which consist of dividends and price at time of sale.</p>
+<ul>
+<li class="fragment"><span class="math inline">\(V_{0} = \frac{E_{t}[D_{t+1}]}{1+k}+\frac{E_{t}[D_{t+2}]}{(1+k)^{2}}+\cdots +\frac{E_{t}[D_{t+H}+P_{H}]}{(1+k)^{H}}\)</span>, where <span class="math inline">\(k\)</span> is the discount rate and <span class="math inline">\(D\)</span> are dividends.</li>
+<li class="fragment"><span class="math inline">\(V_{0} = \sum_{t=1}^{\infty}\frac{D_{t}}{(1+k)^{t}}\)</span></li>
+</ul>
+</div>
+</section>
+<section id="gordon-growth-model" class="slide level3">
+<h3>Gordon Growth Model</h3>
+<p>Q: What if dividends are expected to grow at a constant rate forever?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(V_{0} = \frac{D_{1}}{k-g}\)</span>, where <span class="math inline">\(g\)</span> is the constant dividend growth rate and <span class="math inline">\(k&gt;g\)</span></li>
+<li class="fragment">Simple, but very sensitive to the assumed <span class="math inline">\(g\)</span> and <span class="math inline">\(k\)</span> — small changes in either can swing valuation a lot</li>
+</ul>
+</div>
+</section>
+<section id="pe-ratio" class="slide level3">
+<h3>P/E Ratio</h3>
+<p>Q: What is the P/E ratio? How is it measured? How is it used?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">P/E = Price to Earnings</li>
+<li class="fragment">Price is observed</li>
+<li class="fragment">Earnings of the company can be historic or expected. Usually for a 4Qtr period.</li>
+<li class="fragment">Trailing P/E uses realized past earnings; Forward P/E uses expected (analyst) earnings</li>
+<li class="fragment">PEG = P/E <span class="math inline">\(\div\)</span> expected earnings growth rate — adjusts P/E for differences in growth across stocks</li>
+<li class="fragment">“High” P/E implies the stock is expensive</li>
+<li class="fragment">“High” might be judged relative to peers, own past, or some subjective measure</li>
+</ul>
+</div>
+</section>
+</section>
+<section>
+<section id="corporate-fundamentals" class="title-slide slide level1 center">
+<h1>Corporate Fundamentals</h1>
+
+</section>
+<section id="income-statement" class="slide level3">
+<h3>Income Statement</h3>
+<p>Q: What does the income statement measure?</p>
+<div class="fragment">
+<p>A: The flow of revenues and expenses over a period, ending in net income.</p>
+<ul>
+<li class="fragment">Revenue (Sales)</li>
+<li class="fragment"><span class="math inline">\(-\)</span> Cost of Goods Sold (COGS) <span class="math inline">\(=\)</span> Gross Profit</li>
+<li class="fragment"><span class="math inline">\(-\)</span> Operating Expenses (SG&amp;A, R&amp;D) <span class="math inline">\(=\)</span> Operating Income (EBIT)</li>
+<li class="fragment"><span class="math inline">\(-\)</span> Interest Expense <span class="math inline">\(=\)</span> Pre-Tax Income (EBT)</li>
+<li class="fragment"><span class="math inline">\(-\)</span> Taxes <span class="math inline">\(=\)</span> Net Income</li>
+<li class="fragment">Net Income <span class="math inline">\(\div\)</span> Shares Outstanding <span class="math inline">\(=\)</span> EPS</li>
+</ul>
+</div>
+</section>
+<section id="balance-sheet" class="slide level3">
+<h3>Balance Sheet</h3>
+<p>Q: What does the balance sheet measure?</p>
+<div class="fragment">
+<p>A: A snapshot of what a firm owns and owes at a point in time.</p>
+<ul>
+<li class="fragment">Assets <span class="math inline">\(=\)</span> Liabilities <span class="math inline">\(+\)</span> Shareholders’ Equity</li>
+<li class="fragment">Current assets/liabilities: convert to (or come due in) cash within one year</li>
+<li class="fragment">Non-current: long-term assets (PP&amp;E, goodwill) and long-term debt</li>
+<li class="fragment">Working Capital <span class="math inline">\(=\)</span> Current Assets <span class="math inline">\(-\)</span> Current Liabilities</li>
+</ul>
+</div>
+</section>
+<section id="cash-flow-statement" class="slide level3">
+<h3>Cash Flow Statement</h3>
+<p>Q: Why do we need a third statement beyond the income statement and balance sheet?</p>
+<div class="fragment">
+<p>A: Net income relies on accruals (non-cash items); the cash flow statement reconciles it to actual cash.</p>
+<ul>
+<li class="fragment">Operating Cash Flow (CFO): cash generated by the core business</li>
+<li class="fragment">Investing Cash Flow (CFI): capex, acquisitions, asset sales</li>
+<li class="fragment">Financing Cash Flow (CFF): debt issuance/repayment, dividends, buybacks</li>
+<li class="fragment">Free Cash Flow (FCF) <span class="math inline">\(=\)</span> CFO <span class="math inline">\(-\)</span> CapEx: cash available to all capital providers</li>
+</ul>
+</div>
+</section>
+<section id="key-ratios" class="slide level3">
+<h3>Key Ratios</h3>
+<p>Q: How do we summarize firm health from these three statements?</p>
+<div class="fragment">
+<p>A:</p>
+<p><strong>Profitability</strong></p>
+<ul>
+<li class="fragment">Gross Margin <span class="math inline">\(=\)</span> Gross Profit / Revenue</li>
+<li class="fragment">Net Margin <span class="math inline">\(=\)</span> Net Income / Revenue</li>
+<li class="fragment">ROE <span class="math inline">\(=\)</span> Net Income / Equity; ROA <span class="math inline">\(=\)</span> Net Income / Assets</li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Liquidity</strong></p>
+<ul>
+<li class="fragment">Current Ratio <span class="math inline">\(=\)</span> Current Assets / Current Liabilities</li>
+<li class="fragment">Quick Ratio <span class="math inline">\(=\)</span> (Current Assets <span class="math inline">\(-\)</span> Inventory) / Current Liabilities</li>
+</ul>
+</div>
+</section>
+<section id="key-ratios-continued" class="slide level3">
+<h3>Key Ratios (continued)</h3>
+<p><strong>Leverage</strong></p>
+<ul>
+<li class="fragment">Debt/Equity <span class="math inline">\(=\)</span> Total Debt / Equity</li>
+<li class="fragment">Interest Coverage <span class="math inline">\(=\)</span> EBIT / Interest Expense</li>
+</ul>
+<div class="fragment">
+<p><strong>Efficiency</strong></p>
+<ul>
+<li class="fragment">Asset Turnover <span class="math inline">\(=\)</span> Revenue / Assets</li>
+<li class="fragment">Inventory Turnover <span class="math inline">\(=\)</span> COGS / Average Inventory</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="macro-drivers" class="title-slide slide level1 center">
+<h1>Macro Drivers</h1>
+
+</section>
+<section id="macro-kpi" class="slide level3">
+<h3>Macro KPI</h3>
+<p>Q: What are the 4 major macro KPIs?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">GDP: Gross Domestic Product (measure of aggregate economic activity)</li>
+<li class="fragment">UR: Unemployment Rate (fraction of labor force unemployed)</li>
+<li class="fragment">CPI: Consumer Price Index (price index for consumer purchases)</li>
+<li class="fragment">10yr: Yield on US Ten Year Treasury (yield to maturity)</li>
+</ul>
+</div>
+</section>
+<section id="connecting-the-kpis" class="slide level3">
+<h3>Connecting the KPIs</h3>
+<div class="fragment">
+<p><img data-src="MacroCycle1.jpg" style="width:50.0%"></p>
+</div>
+</section>
+<section id="explaining-the-connections" class="slide level3">
+<h3>Explaining the Connections</h3>
+<p>Q: Can you theoretically connect the Macro KPIs?</p>
+<div class="fragment">
+<p><img data-src="MacroCycle2.jpg" style="width:50.0%"></p>
+</div>
+</section>
+<section id="okuns-law" class="slide level3">
+<h3>Okun’s Law</h3>
+<p>Q: What does Okun’s Law capture?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Relationship between labor market and aggregate output</li>
+<li class="fragment">Greater demand for production implies greater demand for labor…</li>
+<li class="fragment">… if labor supply is unchanged, then …</li>
+<li class="fragment">… unemployment rate falls</li>
+</ul>
+</div>
+</section>
+<section id="the-phillips-curve" class="slide level3">
+<h3>The Phillips Curve</h3>
+<p>Q: What tradeoff does the Phillips Curve describe?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Short-run: an inverse relationship between inflation and unemployment</li>
+<li class="fragment">Intuition: tighter labor markets (low unemployment) push wages and prices up</li>
+<li class="fragment">The long-run Phillips Curve is widely viewed as vertical at the “natural rate” of unemployment — no permanent tradeoff</li>
+</ul>
+</div>
+</section>
+<section id="the-taylor-rule" class="slide level3">
+<h3>The Taylor Rule</h3>
+<p>Q: How do central banks set the policy rate, in theory?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(i_{t} = r^{*}+\pi_{t}+0.5(\pi_{t}-\pi^{*})+0.5(y_{t}-y^{*})\)</span></li>
+<li class="fragment"><span class="math inline">\(r^{*}\)</span>: neutral real rate; <span class="math inline">\(\pi^{*}\)</span>: inflation target; <span class="math inline">\((y_{t}-y^{*})\)</span>: output gap</li>
+<li class="fragment">Raises rates when inflation runs above target or the economy runs hot; cuts rates when either runs below</li>
+</ul>
+</div>
+</section>
+<section id="the-is-curve" class="slide level3">
+<h3>The IS Curve</h3>
+<p>Q: What does the IS curve capture?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">The relationship between real output and the real interest rate</li>
+<li class="fragment">Higher real rates <span class="math inline">\(\rightarrow\)</span> lower investment/consumption <span class="math inline">\(\rightarrow\)</span> lower output (downward sloping)</li>
+<li class="fragment">Combined with a monetary policy rule, gives the “IS-MP” (or IS-LM) framework for jointly determining output and rates</li>
+</ul>
+</div>
+</section>
+<section id="business-cycles" class="slide level3">
+<h3>Business Cycles</h3>
+<p>Q: What are the phases of a business cycle, and how long does one typically last?</p>
+<div class="fragment">
+<p>A:</p>
+<ul>
+<li class="fragment">Phases: Expansion <span class="math inline">\(\rightarrow\)</span> Peak <span class="math inline">\(\rightarrow\)</span> Contraction (recession) <span class="math inline">\(\rightarrow\)</span> Trough <span class="math inline">\(\rightarrow\)</span> Expansion again</li>
+<li class="fragment">U.S. cycles have historically averaged roughly 5-6 years peak-to-peak, though duration is highly variable</li>
+<li class="fragment">The NBER Business Cycle Dating Committee determines official U.S. turning points using a range of indicators, not a single GDP rule</li>
+<li class="fragment">Indicators are classified as Leading (e.g.&nbsp;yield curve, building permits), Coincident (e.g.&nbsp;industrial production, employment), or Lagging (e.g.&nbsp;unemployment duration, inflation)</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="from-theory-to-financial-data-science" class="title-slide slide level1 center">
+<h1>From Theory to Financial Data Science</h1>
+
+</section>
+<section id="why-this-review-matters-for-the-course" class="slide level3">
+<h3>Why This Review Matters for the Course</h3>
+<ul>
+<li class="fragment">Log returns <span class="math inline">\(\rightarrow\)</span> the natural scale for time-series models (stationarity, additivity)</li>
+<li class="fragment">Risk/covariance models <span class="math inline">\(\rightarrow\)</span> inputs to portfolio optimization, VaR, and ML-based risk models</li>
+<li class="fragment">Factor models <span class="math inline">\(\rightarrow\)</span> feature engineering for return prediction and risk attribution</li>
+<li class="fragment">Discounting &amp; duration <span class="math inline">\(\rightarrow\)</span> scenario analysis and cash-flow forecasting under rate/macro shocks</li>
+<li class="fragment">Financial statements &amp; ratios <span class="math inline">\(\rightarrow\)</span> structured features for credit-risk and corporate-forecasting models</li>
+<li class="fragment">Business cycle &amp; macro drivers <span class="math inline">\(\rightarrow\)</span> the conditioning variables behind any scenario or stress-testing exercise</li>
+</ul>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>Mike Aguilar | mike.aguilar@duke.edu</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="FinanceForFDS_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="FinanceForFDS_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":false,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true,"titleSelector":"h1, h2","hideMissingTitles":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 6.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
