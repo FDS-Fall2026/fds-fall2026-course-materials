@@ -1,0 +1,818 @@
+---
+title: "Cleaning & Engineering"
+substitle: "Data for Financial Data Science"
+author: Mike Aguilar
+format: html
+editor: visual
+toc: true
+toc-depth: 5
+toc-location: left
+embed-resources: true
+execute:
+  warning: false
+  echo: true
+---
+
+# Housekeeping
+
+```{r}
+#| warning: FALSE
+
+cat("\014")  # clear console
+rm(list = ls())  # clear the workspace
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+suppressPackageStartupMessages(library(here))
+source(here("Supporting", "ProjectSetup.R"))
+```
+
+# Cleaning
+
+## Missing
+
+Missing values (NA) occur when an observation is unavailable. Before deciding how to handle them, determine:
+
+How many are missing? Where are they located (beginning, middle, or end)? Why are they missing?
+
+Common remedies include:
+
+- Delete observations
+- Forward fill
+- Linear interpolation
+
+Task: create a tibble called prices with two columns. Date: starting 1Jan2026, formatted as a date, and progressing for 7 days. Price with values 100, 101,missing, missing, 105, missing, 107.
+
+```{r}
+prices <- tibble(
+  Date = seq(as.Date("2026-01-01"), by = "day", length.out = 7),
+  Price = c(100, 101, NA, NA, 105, NA, 107)
+)
+prices
+```
+
+Task: sum over the Price colum using is.na
+
+```{r}
+sum(is.na(prices$Price))
+```
+
+Q: What is the meaning of this output?
+
+A: 3 missing values
+
+Task: Run which(is.na(prices\$Price))
+
+```{r}
+which(is.na(prices$Price))
+```
+
+Q: Interpret the output.
+
+A: The missing values are tin the 3,4, and 6th rows
+
+Task: Drop the rows with missing values
+
+```{r}
+prices %>%
+  drop_na()
+```
+
+Task: use na.approx to fill in the missing values
+
+```{r}
+prices %>%
+  mutate(Price = zoo::na.approx(Price))
+```
+
+Q: What is na.approx doing?
+
+A:
+
+- It's taking a simple linear interpolation between the known points in order to fill in the missing values.
+- For instance, the missing value for 2026-01-6 is the midpoint between 2026-01-05 at 105 and 2026-01-07 at 107.
+- The observations for 2026-01-03 and 2026-01-04 are computed similarly. Formatting is preventing us from seeing more decimals.
+
+Task: use fill from tidyr with direction down to overcome the missing values.
+
+```{r}
+prices %>%
+  tidyr::fill(Price, .direction = "down")
+```
+
+Q: What is fill doing? Why might that be useful?
+
+A:
+
+- The value 2026-01-02 is used as a substitute for 2026-01-03 and 2026-01-04; i.e. it fills down the vector
+- This might be useful if 101 was indeed the last observed price, and so that could be considered the best information available for those days.
+
+## Duplicates
+
+Duplicate observations often arise after downloading data from multiple sources or merging datasets.
+
+Duplicates should usually be identified using the variables that uniquely identify an observation.
+
+Task: Create a simple tibble of Date and Price. Let's repeat the 2026-01-02 record
+
+```{r}
+prices <- tibble(
+  Date = as.Date(c(
+    "2026-01-01",
+    "2026-01-02",
+    "2026-01-02",
+    "2026-01-03")),
+  Price = c(100,101,101,102)
+)
+
+prices
+```
+
+Task: use "duplicated()" from dyplyr
+
+```{r}
+prices %>%
+  duplicated()
+```
+
+Q: What is duplicated() doing for us?
+
+A: It is producing a boolean to signal where duplicate rows are located
+
+Task: Use "distinct()" from dyplyr
+
+```{r}
+prices %>%
+  distinct()
+```
+
+Q: What is distinct() doing for us?
+
+A: Distinct is producing only the unique rows
+
+## Invalid
+
+Some observations are impossible or inconsistent.
+
+Q: Can you think of a few examples within our domain of Financial Data Science?
+
+A:
+
+- Negative prices
+- Negative trading volume
+- Interest rates below logical limits (depending on context)
+- Future dates Prices equal to zero
+
+These observations should be investigated before analysis.
+
+Task: Create a simple tibble with a negative price
+
+```{r}
+prices <- tibble(
+  Date = seq(as.Date("2026-01-01"), by="day", length.out=5),
+  Price = c(100,101,-5,103,104)
+)
+
+prices
+```
+
+Task: filter on negative prices via dyplyr
+
+```{r}
+prices %>%
+  filter(Price < 0)
+```
+
+Q: What's the relevance in our context?
+
+A: Price is recorded as neagtive, which we will assume cannot happen. Something may be wrong with our data, and deserves exploration.
+
+Task: filter on "valid" prices via dyplyr
+
+```{r}
+prices %>%
+  filter(Price >= 0)
+```
+
+Q: Why might this approach be troublesome?
+
+A:
+
+- We deleted the troublesome observation.
+- 
+  1.  This could disrupt persistence in the series
+- 
+  2.  Without knowing the reason why it's missing, we might be omitting a relevant factor
+
+## Sorting
+
+Many financial calculations assume observations are in chronological order.
+
+Always verify the data are sorted before computing
+
+Q: What is the best practice when sorting? oldest to youngest or vice versa?
+
+A: Best practice is to sort from oldest to youngest
+
+Task: Create a small tibble of prices that is out of order
+
+```{r}
+prices <- tibble(
+  Date = as.Date(c(
+    "2026-01-03",
+    "2026-01-01",
+    "2026-01-02")),
+  Price = c(102,100,101)
+)
+
+prices
+```
+
+Task: arrange by date using dyplyr
+
+```{r}
+prices %>%
+  arrange(Date)
+```
+
+## Filtering
+
+Filtering selects only the observations that satisfy specified conditions.
+
+Common examples in our financial data science context include
+
+- One ticker
+- One year
+- Positive returns
+- Trading days after a given date
+
+Task: Create a simple tibble starting at 2026-01-01. Sequence for 5 consecutive day and populate with prices 100, 101, 102, 103,104
+
+```{r}
+prices <- tibble(
+  Date = seq(as.Date("2026-01-01"), by="day", length.out=5),
+  Price = c(100,101,102,103,104)
+)
+
+prices
+```
+
+Task: use dyplyr filter to grab only the observations after 2Jan
+
+```{r}
+prices %>%
+  filter(Date > as.Date("2026-01-02"))
+```
+
+Task: Create a simple tibble with AAPL and MSFT. We observe each for a single point in 2025 and 2026. The return for AAPL is .1 and .08 for 2025, 2026, respectively, and .15, .12 for MSFT.
+
+```{r}
+stocks <- tibble(
+  Ticker = c("AAPL","AAPL","MSFT","MSFT"),
+  Year = c(2025,2026,2025,2026),
+  Return = c(.10,.08,.15,.12)
+)
+```
+
+Task: Use dyplyr filter to extract only AAPL in 2026
+
+```{r}
+stocks %>%
+  filter(Ticker == "AAPL", Year == 2026)
+```
+
+# Working with Dates
+
+## Formatting
+
+Sometimes, the databases from which we extract financial data don't have dates that are formatted in a manner that is easy for analysis.
+
+Let's explore a few data vendors, their date formats, and correct as needed.
+
+### Yahoo finance
+
+Task: mimic a small sample of data from Yahoo Finance
+
+```{r}
+prices <- tibble(
+  Date = as.Date(c(
+    "2026-01-02",
+    "2026-01-05",
+    "2026-01-06")),
+  Price = c(100,101,103)
+)
+
+prices
+```
+
+Task: Use class to determine the date format
+
+```{r}
+class(prices$Date)
+```
+
+Q: Any concerns?
+
+A: No. Yahoo Finance already provides us dates in a manner that is easy for us to read and analyze.
+
+### Ken French
+
+Task: Create a small tibble to mimic the date formats from Ken French's data repo
+
+```{r}
+factors <- tibble(
+  Date = c(202510, 202511, 202512),
+  Mkt_RF = c(1.2, -0.8, 2.5)
+)
+
+factors
+```
+
+Task: Use class to determine the date format
+
+```{r}
+class(factors$Date)
+```
+
+Q: Any concerns?
+
+A: Yes. The dates are numeric, not Date.
+
+Task: Use dyplyr to create a new Date object via the ymd function
+
+```{r}
+factors <- factors %>%
+  mutate(
+    Date = lubridate::ymd(paste0(Date, "01"))
+  )
+
+factors
+```
+
+### FRED
+
+Task: Create a small tiblle to mimic dates from FRED
+
+```{r}
+cpi <- tibble(
+  Date = as.Date(c(
+    "2025-10-01",
+    "2025-11-01",
+    "2025-12-01")),
+  CPI = c(322.5,323.0,323.6)
+)
+
+cpi
+```
+
+```{r}
+class(cpi$Date)
+```
+
+Q: Any concerns?
+
+A:
+
+- None regarding the formatting.
+- However, notice that FRED uses the first day of the month to indicate the data for the entire month. We need to use caution if we combine with daily data or try to align with events.
+
+## Aggregation
+
+A very common engineering task when dealing with time series data, is aggregating; e.g. days to weeks; months to years.
+
+Task: Create a simple tibble of sales data starting at 2026-01-05. Use "seq" to carry those dates 14 total calendar days. Add a price column with values 100, 101, ...113.
+
+```{r}
+prices <- tibble(
+  Date = seq(as.Date("2026-01-05"), by = "day", length.out = 14),
+  Price = c(100:113)
+)
+
+prices
+```
+
+Task: Add the day of the week to the prices object
+
+```{r}
+prices<- prices %>%
+  mutate(DayOfWeek = weekdays(Date))
+prices
+```
+
+Task: Add a column that marks the date of the first day of each week in which that date appears.
+
+```{r}
+prices <- prices %>%
+  mutate(
+    WeekFirstDay = lubridate::floor_date(
+      Date,
+      unit = "week",
+      week_start = 1
+    )
+  )
+
+prices
+```
+
+Task: Add a column that marks the price of the first day of each week in which that date appears.
+
+```{r}
+prices <- prices %>%
+  group_by(WeekFirstDay) %>%
+  mutate(
+    WeekFirstPrice = first(Price)
+  ) %>%
+  ungroup()
+
+prices
+```
+
+Task: Add a column that marks the date of the last day of each week in which that date appears.
+
+```{r}
+prices <- prices %>%
+  group_by(WeekFirstDay) %>%
+  mutate(
+    WeekLastDay = last(Date)
+  ) %>%
+  ungroup()
+
+prices
+```
+
+Task: Add a column that marks the price of the last day of each week in which that date appears.
+
+```{r}
+prices <- prices %>%
+  group_by(WeekFirstDay) %>%
+  mutate(
+    WeekLastPrice = last(Price)
+  ) %>%
+  ungroup()
+
+prices
+```
+
+Task: Add a column that marks the average of the prices for the week in which that date appears.
+
+```{r}
+prices <- prices %>%
+  group_by(WeekFirstDay) %>%
+  mutate(
+    WeekAvgPrice = mean(Price)
+  ) %>%
+  ungroup()
+
+prices
+```
+
+# Reshaping
+
+## Wide vs Long
+
+Task: create a wide tibble with Date (2026-01-31, 2026-02-28, 2026-03-31). Then add 3 columns of prices. For AAPL (190,195,198), MSFT (420, 425, 430), and NVDA (140, 145, 150)
+
+```{r}
+stocks_wide <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-02-28",
+    "2026-03-31")),
+  AAPL = c(190,195,198),
+  MSFT = c(420,425,430),
+  NVDA = c(140,145,150)
+)
+
+stocks_wide
+```
+
+Q: Suppose we want to convert the wide dataframe to long. Describe that long object; how many columns? how many rows? what are the columns? what are the rows?
+
+A:
+
+- The wide object had 4 columns (Date, AAPL, MSFT, NVDA).
+- The long object should have three columns (Date, Ticker, Price)
+
+Task: Convert the wide dataframe to long
+
+```{r}
+stocks_long <- stocks_wide %>%
+  pivot_longer(
+    cols = -Date,
+    names_to = "Ticker",
+    values_to = "Price"
+  ) 
+
+stocks_long
+```
+
+Task: Rearrange that long object by ticker and within each ticker arrange by date in ascending order
+
+```{r}
+stocks_long %>%
+    arrange(Ticker, Date)
+
+```
+
+Task: Reshape the long back into wide
+
+```{r}
+stocks_long %>%
+  pivot_wider(
+    names_from = Ticker,
+    values_from = Price
+  )
+```
+
+## Selecting
+
+We often want to examine a subset of our fields/columns. Within dyply we can use "select". Moreover, we often want to restrict our attention to a subset of values. Within dyplyr we can use "filter".
+
+Task: From the wide dataframe, create a subset of stocks_wide that has only Date, APPL, and MSFT
+
+```{r}
+stocks_wide %>%
+  select(Date, AAPL, MSFT)
+```
+
+Task: From the long dataframe, create a subset of stocks_long that focuses on APPL and MSFT
+
+```{r}
+stocks_long %>%
+  filter(Ticker %in% c("AAPL", "MSFT"))
+```
+
+## Joining
+
+We will often need to join/merge datasets and data objects. For instance, suppose we wanted to explore the relationship between inflation and asset returns. We need to create an object that contains both of these values. Importantly, the rows need to be aligned such that the dates align. There are several ways to join. in this small exercise, we will examine left_join.
+
+Task: Create a small tibble for dates 2026-01-31, 2026-02-28, 2026-03-31, and returns .025, -.012, .041.
+
+```{r}
+returns <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-02-28",
+    "2026-03-31")),
+  Return = c(0.025,-0.012,0.041)
+)
+
+returns
+```
+
+Task: Create a small tibble for dates 2026-01-31, 2026-03-31 and inflation .003, .004
+
+```{r}
+inflation <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-03-31")),
+  Inflation = c(0.003,0.004)
+)
+
+inflation
+```
+
+Task: create an object "combine" that is a left_join between returns and inflation by Date.
+
+```{r}
+combined <- left_join(returns,inflation, by = "Date")
+combined
+```
+
+Task: recreate the combined object but reverse the order of inflation and returns in the left_join
+
+```{r}
+combined <- left_join(inflation, returns, by = "Date")
+combined
+```
+
+Q: Why are they different?
+
+A:
+
+- left_join(x,y,by=Date) adds data from y to x by matching Date
+- If there is no y that matches Date for a given x, then it returns NA
+- This was the case in the first instance of combined. There was a value of returns in Feb but no inflation, hence the NA
+- In the second instance of left join, there was no inflation for Feb2026, and so left_join didn't add anything.
+
+# Returns Engineering
+
+Within financial data science one of the seminal target variables is return. Although it may seem simple, the concept and calculation of returns requires great care.
+
+## Simple vs Log
+
+Task: Create a simple tibble of monthly returns starting from 2026-01-31 and progressing for a total of 5 months. Add prices of 98, 104, 102, 108, 111.
+
+```{r}
+prices <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-02-28",
+    "2026-03-31",
+    "2026-04-30",
+    "2026-05-31"
+  )),
+  Price = c(98, 104, 102, 108, 111)
+)
+
+prices
+```
+
+Task: create an object called "returns" that has Gross Simple Returns, Net Simple Returns, and Net Log Returns
+
+```{r}
+returns <- prices %>%
+  mutate(
+    GrossSimpleReturn = Price / lag(Price),
+    NetSimpleReturn   = GrossSimpleReturn - 1,
+    NetLogReturn   = log(GrossSimpleReturn)
+  )
+
+returns
+```
+
+## Multi horizon returns
+
+Our databases sometimes have returns, not prices. Moreover, returns are often used in modeling and comparison. These stylized facts leave return as the core data object. That return, however, may not be observed over the horizon of interest. For example, we may have daily returns, but want monthly.
+
+Task: Compute rolling 2 month Gross Simple Return, and rolling 2 month new Simple Return
+
+```{r}
+returns %>%
+  mutate(
+    GrossSimple2 = GrossSimpleReturn * lag(GrossSimpleReturn,1),
+    NetSimple2   = GrossSimple2 - 1
+  )
+
+```
+
+Task: Compute rolling 2 month Net Log Return
+
+```{r}
+returns %>%
+  mutate(
+    NetLog2 = NetLogReturn + lag(NetLogReturn,1)
+  )
+```
+
+## Annualization
+
+Q: What is the motivation for annualization in our typical financial data science setting?
+
+A: We often want to compare returns over different length periods; e.g. last 12mths vs last 24mths
+
+Task: Suppose the daily_return was 0.0008. Convert to an annual return. You may assume 252 trading days per year.
+
+```{r}
+daily_return <- 0.0008
+(1 + daily_return)^252 - 1
+```
+
+Task: Suppose the quarter_return was .05. Convert to an annual return.
+
+```{r}
+quarter_return <- 0.05
+
+(1 + quarter_return)^4 - 1
+```
+
+Task: Suppose the total return over a 4 year period was 40%. Convert to an annual return.
+
+```{r}
+total_return <- 0.40
+years <- 4
+
+(1 + total_return)^(1/years) - 1
+```
+
+## Indexing
+
+Q: Explain what (re)indexing means and it's potential use within our financial data science context.
+
+A:
+
+- (re)indexing is when we alter the base value around which a time series revolves.
+- A common application is when we want to compare two stocks over time. If one start at \$14 and the other starts at \$2,500, the time (single vertical axis) series plot is not very useful.
+- Moreover, the user cannot easily compute the total growth in either series by simply viewing the chart.
+- (re)index establishes a new start value (often \$1 or \$100) and creates a synthetic version of the price that mimics the growth of the original series, plot is applied to the new (re)indexed series.
+
+Task: create an index for the price object, starting from 1
+
+```{r}
+prices %>%
+  mutate(
+    Index = 1 * Price / first(Price)
+  )
+```
+
+Q: What does the index mean in our case?
+
+A: \$1 invested in this asset 2026-01-31 would be worth \$1.13 as of 2026-05-31.
+
+## Lags
+
+Lags are commonplace in financial data science. In fact, we've already used a lag operator in order to generate returns. Let's expand slightly.
+
+Task: Add columns to the "prices" object that contains 1,2,3 lags
+
+```{r}
+prices<-prices %>%
+  mutate(
+    Lag1 = lag(Price,1),
+    Lag2 = lag(Price,2),
+    Lag3 = lag(Price,3)
+  )
+  prices
+```
+
+Task: Add columns to the "prices" object that contains 1,2,3 leads
+
+```{r}
+prices<-prices %>%
+  mutate(
+    Lead1 = lead(Price,1),
+    Lead2 = lead(Price,2),
+    Lead3 = lead(Price,3)
+  )
+  prices
+```
+
+## Inflation adjustment
+
+Q: Can you think of a use case for inflation adjustment within our financial data science context?
+
+A:
+
+- Examples abound.\
+- If we are focused on returns, private wealth managers often use "real" expected returns on assets so that they can help clients plan for future purchases.
+
+Task: Create a simple tibble for the months of Jan, Feb, Mar, Apr 2026 with Nominal returns = .03, .02, -.01, .04 and month over month Inflation = .004, .003, .002, .005
+
+```{r}
+returns <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-02-28",
+    "2026-03-31",
+    "2026-04-30"
+  )),
+  Nominal = c(0.03, 0.02, -0.01, 0.04),
+  Inflation = c(0.004, 0.003, 0.002, 0.005)
+)
+
+returns
+```
+
+Task: Add a column "Real" using the exact Fisher formula
+
+```{r}
+returns<-returns %>%
+  mutate(
+    Real = (1 + Nominal)/(1 + Inflation) - 1
+  )
+```
+
+Task: Add a columns "ApproxReal" which shows the real return using the Fisher approximation, and ApproxError which is the Approx Real minus Real
+
+```{r}
+returns %>%
+  mutate(
+    ApproxReal = Nominal - Inflation,
+    ApproxError = ApproxReal - Real
+  )
+```
+
+Q: In what circumstance might the Approximation Error grow?
+
+A: When the returns or inflation are large.
+
+Task: Create a simple tibble for Jan, Feb, Mar, Apr 2026 with Prices 100, 103, 105, 108 and CPI index level 120,120.4, 120.8, 121.2. Let's assume that the CPI is indexed at 2020-01-31 = 100.
+
+```{r}
+prices <- tibble(
+  Date = as.Date(c(
+    "2026-01-31",
+    "2026-02-28",
+    "2026-03-31",
+    "2026-04-30"
+  )),
+  Price = c(100, 103, 105, 108),
+  CPI = c(120.0, 120.4, 120.8, 121.2)
+)
+prices
+```
+
+Task: Add the Real Price to the prices object
+
+```{r}
+CPI_base <- 100
+
+prices <- prices %>%
+  mutate(
+    RealPrice = Price * CPI_base / CPI
+  )
+  prices
+```
+
+Q: What is the meaning of the 2026-04-30 Real Price?
+
+A: The \$108 April 2026 price has the same purchasing power as \$89.1 in January 2020 dollars.

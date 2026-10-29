@@ -1,0 +1,789 @@
+---
+title: "Finance Theory for Financial Data Science"
+author: "Mike Aguilar (mike.aguilar@duke.edu)"
+format:
+  revealjs:
+    width: 1600
+    height: 700
+    margin: .06
+    incremental: true
+    slide-number: true
+    slide-level: 3
+    toc: true
+    toc-depth: 1
+    drawing: true
+    chalkboard: true
+    embed-resources: false #switch to true when distribute + switch chalkboard to false
+    auto-section-title: true
+    footer: "Mike Aguilar | mike.aguilar@duke.edu"
+    menu:
+      titleSelector: 'h1, h2'
+      useTextContentForMissingTitles: false
+      hideMissingTitles: true
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# Intro
+
+- In this deck, we will cover a few of the topics necessary to understand financial data science. This material is by no means exhaustive in its breadth or depth.
+- The expectation is that you have been exposed to most (all?) of this material. As such, this presentation is meant as a reminder as opposed to a first principles introduction.
+- We move from **measuring** returns and risk, to **modern portfolio theory**, to **asset pricing**, to **corporate fundamentals**, to **macro drivers**, which is roughly the order in which these concepts feed into the data science models later in the course.
+
+# Performance Measurement
+
+## Measuring Returns
+
+### Returns are a messy concept
+
+The term "Return" is colloquially abused.
+
+- Net vs Gross
+- Simple vs Log
+- Realized vs Unrealized
+- Price vs Total
+- etc...
+
+### Simple (Daily)
+
+Let's assume $t$ is one day
+
+- 1-Day Net Return (aka Holding Period Yield (HPY)): $R_{t}=\frac{P_{t}-P_{t-1}}{P_{t-1}}=\frac{P_{t}}{P_{t-1}}-1$
+- 1-Day Gross Return (aka Holding Period Return (HPR)) $1+R_{t}=\frac{P_{t}}{P_{t-1}}$
+
+### Simple (Multiperiod)
+
+- 2-Day Net: $R_{t}(2)=\frac{P_{t}-P_{t-2}}{P_{t-2}}$
+- H-Day Net: $R_{t}(H)=\frac{P_{t}-P_{t-H}}{P_{t-H}}$
+- H-Day Gross: $1+R_{t}(H)=(1+R_{t-H+1})\cdots (1+R_{t-1})(1+R_{t})$
+- H-Day Gross: $1+R_{t}(H)=\prod_{j=0}^{H-1}(1+R_{t-j})$
+
+### Simple Total Returns (Stocks)
+
+Define $P$ as price and $D$ as dividend and consider $R_{t} = \frac{P_{t}+D_{t}-P_{t-1}}{P_{t-1}}$.
+
+. . .
+
+Q: Can you write the Simple Total Return and decompose into two values?
+
+. . .
+
+A:
+
+- $1+R_{t} = \frac{P_{t}}{P_{t-1}} + \frac{D_{t}}{P_{t-1}}$
+- Total Return = "Capital Gains Yield" + "Dividend Yield"
+
+### Simple Total Returns (Bonds)
+
+Define $P$ as the price and $C$ as the coupon. Assume purchased at par, such that $P_{t-1}$ equals the face value.
+
+. . .
+
+Q: Can you write the Simple Total Return and decompose into two values?
+
+. . .
+
+A:
+
+- $1+R_{t} = \frac{P_{t}}{P_{t-1}} + \frac{C_{t}}{P_{t-1}}$
+- Total Return = "Capital Gains Yield" + "Coupon Rate"
+
+### Simple Annualized Returns
+
+Q: What is the meaning of "annualized" return?
+
+. . .
+
+A: How much the return would be if continued for an entire year
+
+. . .
+
+- $R_{t}(H)^{A} = (1+R_{t}(H))^{\frac{\# \text{of periods per year}}{H}}-1$
+- $R_{t}(H)^{A} = (\frac{P_{t}}{P_{t-1}})^{\frac{\# \text{of periods per year}}{H}}-1$
+
+### Simple Real Returns
+
+Q: What does "Real" mean? Why use?
+
+. . .
+
+A:"Real" means inflation adjusted. Useful for computing growth of assets in terms of buying power.
+
+. . .
+
+Q: How compute real returns?
+
+- $R_{t}^{Real}(H) = \frac{1+R_{t}(H)}{1+\pi_{t}(H)}-1$
+- where $\pi_{t}(H) = CPI_{t}/CPI_{t-H}-1$
+- Note: CPI is widely used, broad measure of prices, but you could customize. e.g. Price index in your region of the country
+- Note: The horizon for inflation should match the horizon for returns
+
+### Shortcoming of Simple Returns
+
+- Simple Returns are not additive
+  - returns on monday + tuesday + ... + friday does not equal the week's return
+- Simple Returns are not symmetric
+  - \$100 grown 20% is 120. But 120 shrunk by 20% is 96.
+- Our empirical models (e.g. regression) work better with additivity and symmetry
+- Log returns are a common solution
+  - Sum of daily log returns is weekly log return
+  - \$100 grown log return 20% and then shrunk 20% brings you back to \$100
+
+### From Simple to Log Returns
+
+Let's focus on daily returns
+
+- $r_{t}=ln(1+R_{t})=ln(P_{t}/P_{t-1}) = ln(P_{t})-ln(P_{t-1})$
+- $e^{r_{t}}-1=R_{t}$
+
+### MultiPeriod Log Returns
+
+- $r_{t}(2) = ln(1+R_{t}(2))=ln(P_{t}/P_{t-2})$
+- $r_{t}(2) = ln(\frac{P_{t}}{P_{t-1}}\frac{P_{t-1}}{P_{t-2}})$
+- $r_{t}(2) = ln(\frac{P_{t}}{P_{t-1}}) + ln(\frac{P_{t-1}}{P_{t-2}})$
+- $r_{t}(2) = r_{t} + r_{t-1}$
+
+. . .
+
+More generally,
+
+$r_{t}(H) = \sum_{j=0}^{H-1}{r_{t-j}}$
+
+### Annualized Log Returns
+
+$r_{t}(H)^{A} = (\frac{\text{periods per year}}{H})\times r_{t}(H)$
+
+### Real Log Returns
+
+- $r_{t}^{Real} = r_{t}-\pi_{t}^{C}$
+- where $\pi^{C}_{t} = ln(1+\pi_{t})$
+
+### Simple or Log?
+
+- Simple returns are used for performance reporting
+- Log returns are used for statistical modeling
+
+## Measuring Risk
+
+### Risk is Difficult to Measure
+
+Q: Why is risk so much more difficult to measure than returns?
+
+. . .
+
+A: Returns are observed. Risk is not.
+
+. . .
+
+We will discuss the meaning of risk soon, but for now we proxy with variance and standard deviation.
+
+. . .
+
+- $\sigma^{2}_{r_{t}}=\frac{1}{T}\sum_{t=1}^{T}{(r_{t}-\bar{r})^{2}}$
+- $\sigma_{r_{t}} = \sqrt{\sigma^{2}_{r_{t}}}$
+- Both are commonly referred to as \`\`volatility"
+
+### Symmetric vs Asymmetric Risk Measures
+
+Q: Is treating upside and downside surprises the same always appropriate?
+
+. . .
+
+A: Not necessarily.
+
+- Variance/standard deviation penalize upside and downside surprises equally
+- Investors typically only dislike the downside
+- Asymmetric alternatives: semi-variance, Value-at-Risk (VaR), Conditional VaR (Expected Shortfall)
+- We will build several of these as forecasting targets later in the course
+
+## Risk / Return Measures
+
+### Common Measures of the Risk/Return Tradeoff (SR)
+
+. . .
+
+Sharpe Ratio: $SR = \frac{R-R^{f}}{\sigma}$, where $R^{f}$ is the risk free rate
+
+. . .
+
+Q: Meaning? Want high or low?
+
+. . .
+
+A:
+
+- Return in excess of risk free per unit of risk
+- We want high
+
+### Common Measures of the Risk/Return Tradeoff (Tracking Error)
+
+. . .
+
+Tracking Error: $\sqrt{\frac{1}{T-1}\sum_{t=1}^{T}(R^{p}_{t}-R^{B}_{t})^{2}}$, where $R^{p}$ is the portfolio return and $R^{B}$ is the benchmark return.
+
+. . .
+
+Q: Meaning? Want high or low?
+
+. . .
+
+A:
+
+- Variability of portfolio return from benchmark
+- An index fund manager wants this low. An active fund manager might permit this to be higher in order to garner excess performance
+
+### Other Common Measures
+
+Information Ratio: $IR = \frac{R^{p}-R^{B}}{\text{Tracking Error}}$
+
+. . .
+
+- Excess return over benchmark per unit of active (benchmark-relative) risk
+- The Sharpe Ratio of "active" management
+
+. . .
+
+Sortino Ratio: $\frac{R - R^{f}}{\sqrt{\frac{1}{T}\sum_{t=1}^{T}\left[\min\!\left(0,\; R_t - R^{f}\right)\right]^2}}$
+
+. . .
+
+- Like Sharpe Ratio, but rewards managers for upside volatility rather than penalizing it
+
+## Portfolio Risk and Return
+
+### Portfolio Return
+
+Q: What is the return of a portfolio composed of $N$ assets?
+
+. . .
+
+A: $R^{P}_{t} = \sum_{i=1}^{N}w_{i}R_{i,t+1}$
+
+### Portfolio Risk
+
+Q: What is the variance of a portfolio composed of $N$ assets?
+
+A:
+
+- $\sigma^{2}_{P,t} = w'Sw$
+- where $w$ is (Nx1)
+- and $S$ is an (NxN) covariance matrix
+
+### Portfolio Variance (N=2)
+
+Q: What is the variance of a portfolio of 2 assets?
+
+A:
+
+- $\sigma^{2} = w_{A}^{2}\sigma^{2}_{A} + w_{B}^{2}\sigma^{2}_{B}+2\rho_{A,B}w_{A}w_{B}$
+
+### Portfolio Variance (N=3)
+
+Q: What is the variance of a portfolio of 3 assets?
+
+A:
+
+- $\sigma^{2} = w_{A}^{2}\sigma^{2}_{A} + w_{B}^{2}\sigma^{2}_{B}+w_{C}^{2}\sigma^{2}_{C}+2\rho_{A,B}w_{A}w_{B} + 2\rho_{A,C}w_{A}w_{C} + 2\rho_{B,C}w_{B}w_{C}$
+
+### Curse of Dimensionality
+
+We will compute portfolio return and variance from historical data for peformance reporting. Moreover, we will construct these objects on a prospective basis for portfolio allocation. Let's assume for now that the weights are known.
+
+Q: How many parameters do we need to estimate portfolio return of N assets?
+
+. . .
+
+A: $N$ (expected) returns
+
+. . .
+
+Q: How many parameters do we need to estimate the portfolio variance of N assets?
+
+. . .
+
+A: $N+ N(N-1)/2$. For a portfolio of 500 assets that is 125,250 parameters (500 variances and 124,750 unique pairwise covariances)
+
+# Modern Portfolio Theory
+
+### What Is Risk?
+
+Q: What is risk, really?
+
+. . .
+
+A:
+
+- Variance/standard deviation are convenient proxies, not definitions of risk
+- Risk is uncertainty about future outcomes that matter for wealth or wellbeing
+- Not all uncertainty is symmetric, or equally compensated by markets
+
+### Systematic vs Idiosyncratic Risk
+
+Q: Are all sources of risk equally important to a diversified investor?
+
+. . .
+
+A:
+
+- Idiosyncratic (unsystematic) risk: firm or asset-specific, can be diversified away
+- Systematic (market) risk: common across assets, cannot be diversified away
+- Markets only compensate investors for bearing systematic risk
+
+### Diversification
+
+Q: Why does combining assets reduce risk?
+
+. . .
+
+A:
+
+- Recall the N=2 portfolio variance formula: as long as $\rho_{A,B}<1$, portfolio std. dev. is less than the weighted average of the individual std. devs.
+- Diversification eliminates idiosyncratic risk; it cannot eliminate systematic risk
+- As $N\rightarrow\infty$, portfolio variance converges to the average covariance across assets — the systematic risk "floor"
+
+### Expected Utility and Risk Aversion
+
+Q: How do we formalize investor preferences over risky outcomes?
+
+. . .
+
+A:
+
+- Expected utility: $E[U(W)] = \sum_{s}p_{s}U(W_{s})$
+- Risk aversion: concave utility, $U''(W)<0$
+- Certainty equivalent: the certain payoff that delivers the same utility as the risky gamble
+- A risk-averse investor's certainty equivalent is always below the gamble's expected value
+
+### Mean-Variance Preferences
+
+Q: When can we summarize preferences using just mean and variance?
+
+. . .
+
+A:
+
+- Quadratic utility, **or**
+- Returns are jointly normal (or elliptically distributed)
+- Under either condition: $U = E[R_{p}]-\frac{1}{2}\lambda\sigma^{2}_{p}$, where $\lambda$ is the investor's risk-aversion coefficient
+
+### The Efficient Frontier
+
+Q: With many risky assets available, which portfolios are "best"?
+
+. . .
+
+A:
+
+- Minimum-variance frontier: the lowest-variance portfolio achievable for each level of expected return
+- Efficient frontier: the upper portion of that frontier (highest return for each level of variance)
+- Rational, risk-averse investors only ever hold portfolios on the efficient frontier
+
+### Adding a Risk-Free Asset
+
+Q: What changes once a risk-free asset is available?
+
+. . .
+
+A:
+
+- Capital Allocation Line (CAL): straight line from $R_{f}$, tangent to the risky-asset frontier
+- Tangency portfolio: the single risky portfolio touched by that line
+- Two-Fund Separation: every investor holds some mix of the risk-free asset and the **same** tangency portfolio; only the mix (leverage vs. safety) differs by investor
+
+### Portfolio Optimization in Practice
+
+Q: How do we solve for optimal weights?
+
+. . .
+
+A:
+
+- Minimize $w'Sw$ subject to $w'\mu=R^{target}$ and $w'\mathbf{1}=1$
+- Solved via quadratic programming / Lagrangian methods
+- Inputs ($\mu$, $S$) are estimated with error — "optimization is error maximization" (Michaud)
+- Motivates shrinkage estimators, Black-Litterman, and robust optimization — themes we'll revisit with ML tools later in the course
+
+# Asset Pricing
+
+## Pricing Risk Free Assets
+
+### Compounding
+
+Q: How much is \$100 grown at 5% per year for one year?
+
+. . .
+
+A:
+
+- $100\times (1.05) = 105$
+- This is known as compounding
+- \$100: Present Value
+- \$105: Future Value
+- 5%: Compounding rate
+- $FV = PV(1+R)$
+
+### Discounting
+
+Q: How much is \$105 promised (with certainty) in one year from now worth today?
+
+A:
+
+- $FV = PV(1+R)$ $\rightarrow$ $PV = FV/(1+R)$
+- We know FV
+- Our goal is to find PV
+- But we don't know R
+- R is known as the discount rate
+- The discount rate captures the opportunity cost (i.e. how much return you require to accept the investment)
+- If the investor's next best option yielded 5%, then $PV = 105/(1+.05) = 100$
+
+### Coupon Bonds
+
+Q: What is the formula for the PV of a 2yr semi annual coupon bond?
+
+. . .
+
+A:
+
+- $PV = \frac{C}{1+R} + \frac{C}{(1+R)^{2}} + \frac{C}{(1+R)^{3}} + \frac{C+F}{(1+R)^{4}}$
+- C: coupon (\$)
+- F: face (\$)
+- R: periodic discount rate (%)
+- C/F: Coupon Rate (%)
+
+### Discount Bond
+
+Q: What is the formula for the PV of a N-yr discount bond?
+
+. . .
+
+A:
+
+- $PV = \frac{F}{(1+R)^{N}}$
+- Discount Bonds don't pay any coupons
+- F: face (\$)
+- R: periodic discount rate (%)
+- N: number of periods
+
+## Asset Market Equilibrium
+
+### Market Risk
+
+- Q: How use exposure to market fluctuations to determine if a stock is over/undervalued? (note: there are several approaches)
+- A: CAPM
+  - First pass: Get beta via time series regression $r_{t}=a+\beta r^{M}_{t}+u_{t}$, where $r_{t}$ is the log excess return at time $t$. Repeat for each stock $i$ and get $\hat{\beta}_{i}$
+  - Second pass: Get lambda via cross section regression $\bar{r}_{i}=\lambda_{0} + \lambda\hat{\beta}_{i}+e_{i}$, where $r_{i}$ is log excess return for asset $i$
+  - Use for valuation (see below)
+
+### Interpreting the CAPM
+
+Q: What do beta and lambda mean?
+
+. . .
+
+A:
+
+- $\beta_{i} = \frac{Cov(r_{i},r_{m})}{Var(r_{m})}$: sensitivity of asset $i$ to market moves (exposure to market risk)
+- $\lambda$: market price of risk (market risk premium)
+
+### The Security Market Line
+
+Q: How do we use CAPM to judge if a stock is over- or under-valued?
+
+. . .
+
+A:
+
+- Security Market Line (SML): y-axis: return vs x-axis: beta
+- Points of the line dictated by CAPM second pass regression. Slope is the $\lambda$, which for the CAPM is the $E[r_{m}-r_{f}]$
+- Plot your subjective expected return. If your subjective expectued return is above the SML, $\alpha_{i}=E[r^{subjective}]-E[r^{capm}]>0$; then you believe the stock is *undervalued* (your expectation is greater than what's priced into the market visa vis CAPM)
+- If your subjective expected return is below the SML, $\alpha_{i}=E[r^{subjective}]-E[r^{capm}]<0$;then you believe the stock is *overvalued* (your expectation is less than what's priced into the market visa vis CAPM)
+
+### Factor Risk
+
+Q: What if a single market factor doesn't fully explain returns?
+
+. . .
+
+A:
+
+- Arbitrage Pricing Theory (APT): returns driven by multiple systematic factors
+- $R_{i} = \alpha_{i}+\beta_{i,1}F_{1}+\beta_{i,2}F_{2}+\cdots+\beta_{i,K}F_{K}+\epsilon_{i}$
+- Fama-French 3-Factor: Market, SMB (size), HML (value)
+- Fama-French 5-Factor adds RMW (profitability), CMA (investment)
+- Momentum (UMD) often added as a 6th factor
+- Factor models double as risk-attribution tools **and** as feature sets for return-prediction models
+
+## Fixed Income
+
+### Duration
+
+Q: How do we measure a bond's sensitivity to interest rate changes?
+
+. . .
+
+A:
+
+- Macaulay Duration: $D = \frac{\sum_{t=1}^{T}t\cdot\frac{CF_{t}}{(1+R)^{t}}}{PV}$ — the PV-weighted average time to receive cash flows
+- Modified Duration: $D_{mod} = \frac{D}{1+R}$
+- Price sensitivity approximation: $\frac{\Delta P}{P}\approx -D_{mod}\times\Delta R$
+- Convexity captures the curvature the linear duration approximation misses
+
+### Duration Matching
+
+Q: Why do risk managers care about duration?
+
+. . .
+
+A:
+
+- Immunization: match asset duration to liability duration so a rate move affects both similarly
+- Longer maturity or lower coupon $\rightarrow$ higher duration; higher coupon $\rightarrow$ lower duration
+- Zero-coupon (discount) bonds have duration equal to maturity — the maximum duration for a given maturity
+
+### Yield Curve
+
+Q: Why is the yield curve typically upward sloping?
+
+. . .
+
+A:
+
+- Expectations: if future short rates are expected to rise, long yields exceed short yields
+- Term/liquidity premium: investors demand compensation for locking up money longer and bearing more rate risk
+- Normal growth expectations + term premium $\rightarrow$ upward slope, on average
+
+### Reading the Curve
+
+Q: What does the shape imply?
+
+. . .
+
+A:
+
+- Steep curve: often associated with expectations of stronger growth/inflation
+- Flat curve: uncertainty or a policy transition
+- Inverted curve (short \> long): historically watched as a signal of rising recession risk, since it implies the market expects future rate cuts (weaker growth ahead)
+- Caveat: the curve reflects expectations, term premia, **and** central bank policy simultaneously — no single indicator is perfect
+
+## Equity
+
+### Dividend Discount Model
+
+Q: What is a stock worth?
+
+. . .
+
+A: Discounted value of future stream of cash flows, which consist of dividends and price at time of sale.
+
+- $V_{0} = \frac{E_{t}[D_{t+1}]}{1+k}+\frac{E_{t}[D_{t+2}]}{(1+k)^{2}}+\cdots +\frac{E_{t}[D_{t+H}+P_{H}]}{(1+k)^{H}}$, where $k$ is the discount rate and $D$ are dividends.
+- $V_{0} = \sum_{t=1}^{\infty}\frac{D_{t}}{(1+k)^{t}}$
+
+### Gordon Growth Model
+
+Q: What if dividends are expected to grow at a constant rate forever?
+
+. . .
+
+A:
+
+- $V_{0} = \frac{D_{1}}{k-g}$, where $g$ is the constant dividend growth rate and $k>g$
+- Simple, but very sensitive to the assumed $g$ and $k$ — small changes in either can swing valuation a lot
+
+### P/E Ratio
+
+Q: What is the P/E ratio? How is it measured? How is it used?
+
+. . .
+
+A:
+
+- P/E = Price to Earnings
+- Price is observed
+- Earnings of the company can be historic or expected. Usually for a 4Qtr period.
+- Trailing P/E uses realized past earnings; Forward P/E uses expected (analyst) earnings
+- PEG = P/E $\div$ expected earnings growth rate — adjusts P/E for differences in growth across stocks
+- "High" P/E implies the stock is expensive
+- "High" might be judged relative to peers, own past, or some subjective measure
+
+# Corporate Fundamentals
+
+### Income Statement
+
+Q: What does the income statement measure?
+
+. . .
+
+A: The flow of revenues and expenses over a period, ending in net income.
+
+- Revenue (Sales)
+- $-$ Cost of Goods Sold (COGS) $=$ Gross Profit
+- $-$ Operating Expenses (SG&A, R&D) $=$ Operating Income (EBIT)
+- $-$ Interest Expense $=$ Pre-Tax Income (EBT)
+- $-$ Taxes $=$ Net Income
+- Net Income $\div$ Shares Outstanding $=$ EPS
+
+### Balance Sheet
+
+Q: What does the balance sheet measure?
+
+. . .
+
+A: A snapshot of what a firm owns and owes at a point in time.
+
+- Assets $=$ Liabilities $+$ Shareholders' Equity
+- Current assets/liabilities: convert to (or come due in) cash within one year
+- Non-current: long-term assets (PP&E, goodwill) and long-term debt
+- Working Capital $=$ Current Assets $-$ Current Liabilities
+
+### Cash Flow Statement
+
+Q: Why do we need a third statement beyond the income statement and balance sheet?
+
+. . .
+
+A: Net income relies on accruals (non-cash items); the cash flow statement reconciles it to actual cash.
+
+- Operating Cash Flow (CFO): cash generated by the core business
+- Investing Cash Flow (CFI): capex, acquisitions, asset sales
+- Financing Cash Flow (CFF): debt issuance/repayment, dividends, buybacks
+- Free Cash Flow (FCF) $=$ CFO $-$ CapEx: cash available to all capital providers
+
+### Key Ratios
+
+Q: How do we summarize firm health from these three statements?
+
+. . .
+
+A:
+
+**Profitability**
+
+- Gross Margin $=$ Gross Profit / Revenue
+- Net Margin $=$ Net Income / Revenue
+- ROE $=$ Net Income / Equity; ROA $=$ Net Income / Assets
+
+. . .
+
+**Liquidity**
+
+- Current Ratio $=$ Current Assets / Current Liabilities
+- Quick Ratio $=$ (Current Assets $-$ Inventory) / Current Liabilities
+
+### Key Ratios (continued)
+
+**Leverage**
+
+- Debt/Equity $=$ Total Debt / Equity
+- Interest Coverage $=$ EBIT / Interest Expense
+
+. . .
+
+**Efficiency**
+
+- Asset Turnover $=$ Revenue / Assets
+- Inventory Turnover $=$ COGS / Average Inventory
+
+# Macro Drivers
+
+### Macro KPI
+
+Q: What are the 4 major macro KPIs?
+
+. . .
+
+A:
+
+- GDP: Gross Domestic Product (measure of aggregate economic activity)
+- UR: Unemployment Rate (fraction of labor force unemployed)
+- CPI: Consumer Price Index (price index for consumer purchases)
+- 10yr: Yield on US Ten Year Treasury (yield to maturity)
+
+### Connecting the KPIs
+
+. . .
+
+![](MacroCycle1.jpg){width="50%"}
+
+### Explaining the Connections
+
+Q: Can you theoretically connect the Macro KPIs?
+
+. . .
+
+![](MacroCycle2.jpg){width="50%"}
+
+### Okun's Law
+
+Q: What does Okun's Law capture?
+
+. . .
+
+A:
+
+- Relationship between labor market and aggregate output
+- Greater demand for production implies greater demand for labor...
+- ... if labor supply is unchanged, then ...
+- ... unemployment rate falls
+
+### The Phillips Curve
+
+Q: What tradeoff does the Phillips Curve describe?
+
+. . .
+
+A:
+
+- Short-run: an inverse relationship between inflation and unemployment
+- Intuition: tighter labor markets (low unemployment) push wages and prices up
+- The long-run Phillips Curve is widely viewed as vertical at the "natural rate" of unemployment — no permanent tradeoff
+
+### The Taylor Rule
+
+Q: How do central banks set the policy rate, in theory?
+
+. . .
+
+A:
+
+- $i_{t} = r^{*}+\pi_{t}+0.5(\pi_{t}-\pi^{*})+0.5(y_{t}-y^{*})$
+- $r^{*}$: neutral real rate; $\pi^{*}$: inflation target; $(y_{t}-y^{*})$: output gap
+- Raises rates when inflation runs above target or the economy runs hot; cuts rates when either runs below
+
+### The IS Curve
+
+Q: What does the IS curve capture?
+
+. . .
+
+A:
+
+- The relationship between real output and the real interest rate
+- Higher real rates $\rightarrow$ lower investment/consumption $\rightarrow$ lower output (downward sloping)
+- Combined with a monetary policy rule, gives the "IS-MP" (or IS-LM) framework for jointly determining output and rates
+
+### Business Cycles
+
+Q: What are the phases of a business cycle, and how long does one typically last?
+
+. . .
+
+A:
+
+- Phases: Expansion $\rightarrow$ Peak $\rightarrow$ Contraction (recession) $\rightarrow$ Trough $\rightarrow$ Expansion again
+- U.S. cycles have historically averaged roughly 5-6 years peak-to-peak, though duration is highly variable
+- The NBER Business Cycle Dating Committee determines official U.S. turning points using a range of indicators, not a single GDP rule
+- Indicators are classified as Leading (e.g. yield curve, building permits), Coincident (e.g. industrial production, employment), or Lagging (e.g. unemployment duration, inflation)
+
+# From Theory to Financial Data Science
+
+### Why This Review Matters for the Course
+
+- Log returns $\rightarrow$ the natural scale for time-series models (stationarity, additivity)
+- Risk/covariance models $\rightarrow$ inputs to portfolio optimization, VaR, and ML-based risk models
+- Factor models $\rightarrow$ feature engineering for return prediction and risk attribution
+- Discounting & duration $\rightarrow$ scenario analysis and cash-flow forecasting under rate/macro shocks
+- Financial statements & ratios $\rightarrow$ structured features for credit-risk and corporate-forecasting models
+- Business cycle & macro drivers $\rightarrow$ the conditioning variables behind any scenario or stress-testing exercise
